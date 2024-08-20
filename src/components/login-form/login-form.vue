@@ -1,7 +1,7 @@
 <template>
   <Form ref="loginForm" :model="form" :rules="rules" @keydown.enter.native="handleSubmit">
-    <FormItem prop="userName">
-      <Input v-model="form.userName" placeholder="请输入用户名">
+    <FormItem prop="username">
+      <Input v-model="form.username" placeholder="请输入用户名">
         <span slot="prepend">
           <Icon :size="16" type="ios-person"></Icon>
         </span>
@@ -41,7 +41,10 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from '@/libs/request'
+import uuid from 'uuid/v4'
+
+import { getCode } from '@/api/login'
 
 export default {
   name: 'LoginForm',
@@ -66,9 +69,10 @@ export default {
   data () {
     return {
       form: {
-        userName: '',
-        password: '',
-        code: ''
+        username: '3129166417@qq.com',
+        password: '123456',
+        code: '',
+        sid: ''
       },
       svg: ''
     }
@@ -76,31 +80,36 @@ export default {
   computed: {
     rules () {
       return {
-        userName: this.userNameRules,
+        username: this.userNameRules,
         password: this.passwordRules
       }
     }
   },
   mounted () {
+    if (localStorage.getItem('sid')) {
+      this.form.sid = localStorage.getItem('sid')
+    } else {
+      this.form.this.sid = uuid()
+      localStorage.setItem('sid', this.sid)
+    }
+    this.$store.commit('setSid', this.sid)
     this._getCaptcha()
   },
   methods: {
     handleSubmit () {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          this.$emit('on-success-valid', {
-            userName: this.form.userName,
-            password: this.form.password
-          })
+          this.$emit('on-success-valid', { ...this.form })
         }
       })
     },
     _getCaptcha () {
-      const baseUrl = 'http://localhost:3000'
-      axios.get(baseUrl + '/public/getCaptcha?sid=yxy').then(res => {
-        if (res.status === 200) {
-          this.svg = res.data.data
-        }
+      // axios.get('/public/getCaptcha?sid=yxy').then(res => {
+      //   console.log(res)
+      //   this.svg = res.data
+      // })
+      getCode(this.form.sid).then(res => {
+        this.svg = res.data
       })
     }
   }
