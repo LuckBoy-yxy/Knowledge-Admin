@@ -118,10 +118,10 @@ export default {
         try {
           getUserInfo(state.token).then(res => {
             const data = res.data
-            commit('setAvatar', data.avatar)
+            commit('setAvatar', data.pic)
             commit('setUserName', data.name)
-            commit('setUserId', data.user_id)
-            commit('setAccess', data.access)
+            commit('setUserId', data._id)
+            commit('setAccess', data.roles)
             commit('setHasGetInfo', true)
             resolve(data)
           }).catch(err => {
