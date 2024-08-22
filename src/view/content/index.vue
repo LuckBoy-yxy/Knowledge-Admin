@@ -11,11 +11,29 @@
         @on-delete="handleDelete"
       />
 
-      <Button
-        style="margin: 10px 0;"
-        type="primary"
-        @click="exportExcel"
-      >导出为Execl文件</Button>
+      <Row
+        type="flex"
+        justify="space-between"
+        align="middle"
+      >
+        <Button
+          style="margin: 10px 0;"
+          type="primary"
+          @click="exportExcel"
+        >导出为Execl文件</Button>
+
+        <Page
+          :total="total"
+          show-elevator
+          show-sizer
+          show-total
+          :current="page"
+          :page-size="pageSize"
+          :page-size-opts="pageArr"
+          @on-change="onPageChange"
+          @on-page-size-change="onPageSizeChange"
+        />
+      </Row>
     </Card>
   </div>
 </template>
@@ -57,7 +75,6 @@ export default {
           width: 120,
           align: 'center',
           render: (h, params) => {
-            console.log(params)
             return h('div', [
               h('span', params.row.uid.name)
             ])
@@ -143,7 +160,6 @@ export default {
           render: (h, params) => {
             return h('div', [
               h('Tag', {
-                class: 'test',
                 props: {
                   color: params.row.status === '0' ? 'success' : 'error'
                 },
@@ -179,17 +195,29 @@ export default {
         }
       ],
       tableData: [],
-      tableDataOptions: {
-        page: 0,
-        pageSize: 10
-      }
+      page: 1,
+      pageSize: 10,
+      total: 40,
+      pageArr: [10, 20, 30, 50, 100]
     }
   },
   methods: {
     _getTabData () {
-      getTabData(this.tableDataOptions).then(res => {
+      getTabData({
+        page: this.page - 1,
+        pageSize: this.pageSize
+      }).then(res => {
         this.tableData = res.data
+        this.total = res.total
       })
+    },
+    onPageChange (page) {
+      this.page = page
+      this._getTabData()
+    },
+    onPageSizeChange (pageSize) {
+      this.pageSize = pageSize
+      this._getTabData()
     },
     handleDelete (params) {
       console.log(params)
