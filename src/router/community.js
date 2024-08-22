@@ -2,7 +2,7 @@ import Main from '@/components/main/index'
 
 export default [
   {
-    path: '/manage',
+    path: '/content',
     name: 'article_management',
     meta: {
       icon: 'logo-buffer',
@@ -11,16 +11,16 @@ export default [
     component: Main,
     children: [
       {
-        path: 'tables_page',
+        path: 'index',
         name: 'content_management',
         meta: {
           icon: 'md-grid',
           title: '内容管理'
         },
-        component: () => import('@/view/components/tables/tables.vue')
+        component: () => import('@/view/content/index.vue')
       },
       {
-        path: 'tables_page',
+        path: 'tags',
         name: 'tags_management',
         meta: {
           icon: 'md-grid',
