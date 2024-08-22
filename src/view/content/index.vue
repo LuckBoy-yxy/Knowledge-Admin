@@ -21,8 +21,12 @@
 </template>
 
 <script>
+import dayjs from 'dayjs'
+
 import Tables from '_c/tables'
+
 import { getTabData } from '@/api/content'
+
 export default {
   name: 'ContentManagement',
   components: {
@@ -40,19 +44,57 @@ export default {
           title: '创建时间',
           key: 'created',
           width: 200,
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('span', dayjs(params.row.created).format('YYYY-MM-DD hh:mm:ss'))
+            ])
+          }
         },
         {
           title: '作者',
           key: 'user',
           width: 120,
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            console.log(params)
+            return h('div', [
+              h('span', params.row.uid.name)
+            ])
+          }
         },
         {
           title: '分类',
           key: 'catalog',
           width: 100,
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            const catalog = params.row.catalog
+            let result = ''
+            switch (catalog) {
+              case 'ask' :
+                result = '提问'
+                break
+              case 'advise' :
+                result = '建议'
+                break
+              case 'discuss' :
+                result = '交流'
+                break
+              case 'share' :
+                result = '分享'
+                break
+              case 'logs' :
+                result = '动态'
+                break
+              case 'notice' :
+                result = '公告'
+                break
+              default:
+                result = '全部'
+            }
+            return h('div', [h('span', result)])
+          }
         },
         {
           title: '积分',
@@ -64,13 +106,22 @@ export default {
           title: '标签',
           key: 'tags',
           width: 120,
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            const result = params.row.tags.map(item => item.name).join(' ,')
+            return h('div', [
+              h('span', result || '未设置')
+            ])
+          }
         },
         {
           title: '是否结束',
           key: 'isEnd',
           width: 100,
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [h('span', params.row.isEnd === '0' ? '是' : '否')])
+          }
         },
         {
           title: '阅读记数',
@@ -88,13 +139,37 @@ export default {
           title: '状态',
           key: 'status',
           width: 120,
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('Tag', {
+                class: 'test',
+                props: {
+                  color: params.row.status === '0' ? 'success' : 'error'
+                },
+                domProps: {
+                  innerHTML: params.row.status === '0' ? 'on' : 'off'
+                }
+              })
+            ])
+          }
         },
         {
           title: '是否置顶',
           key: 'isTop',
           width: 100,
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('Icon', {
+                props: {
+                  color: params.row.isTop === '1' ? '#19be6b' : 'rgba(233, 88, 39)',
+                  type: params.row.isTop === '1' ? 'md-checkmark' : 'md-close',
+                  size: 20
+                }
+              })
+            ])
+          }
         },
         {
           title: '设置',
