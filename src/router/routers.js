@@ -1,5 +1,6 @@
 import Main from '@/components/main'
 import parentView from '@/components/parent-view'
+import community from './community'
 
 /**
  * iview-admin中meta除了原生参数外可配置的参数:
@@ -50,6 +51,7 @@ export default [
       }
     ]
   },
+  ...community,
   {
     path: '',
     name: 'doc',
