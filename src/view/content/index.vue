@@ -8,7 +8,8 @@
         search-place="top"
         v-model="tableData"
         :columns="columns"
-        @on-delete="handleDelete"
+        @on-row-edit="handleRowEdit"
+        @on-row-remove="handleRowRemove"
       />
 
       <Row
@@ -191,7 +192,8 @@ export default {
           title: '设置',
           fixed: 'right',
           width: 160,
-          align: 'center'
+          align: 'center',
+          slot: 'action'
         }
       ],
       tableData: [],
@@ -219,8 +221,20 @@ export default {
       this.pageSize = pageSize
       this._getTabData()
     },
-    handleDelete (params) {
-      console.log(params)
+    handleRowEdit (row, index) {
+      console.log(row, index)
+    },
+    handleRowRemove (row, index) {
+      this.$Modal.confirm({
+        title: `确定删除帖子吗?`,
+        content: `删除第 ${index + 1} 条, 标题为 ${row.title} 的帖子吗?`,
+        onOk: () => {
+          this.$Message.info('删除成功')
+        },
+        onCancel: () => {
+          this.$Message.info('取消操作')
+        }
+      })
     },
     exportExcel () {
       this.$refs.tables.exportCsv({

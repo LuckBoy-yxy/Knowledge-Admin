@@ -37,7 +37,21 @@
       <slot name="header" slot="header"></slot>
       <slot name="footer" slot="footer"></slot>
       <slot name="loading" slot="loading"></slot>
+      <template slot-scope="{ row, index }" slot="action">
+        <Icon
+          type="md-build"
+          size="22"
+          style="margin-right: 15px;"
+          @click.stop="editRow(row, index)"
+        ></Icon>
+        <Icon
+          type="md-trash"
+          size="22"
+          @click.stop="removeRow(row, index)"
+        ></Icon>
+      </template>
     </Table>
+
     <div v-if="searchable && searchPlace === 'bottom'" class="search-con search-con-top">
       <Select v-model="searchKey" class="search-col">
         <Option v-for="item in columns" v-if="item.key !== 'handle'" :value="item.key" :key="`search-col-${item.key}`">{{ item.title }}</Option>
@@ -256,6 +270,12 @@ export default {
     },
     onExpand (row, status) {
       this.$emit('on-expand', row, status)
+    },
+    editRow (row, index) {
+      this.$emit('on-row-edit', row, index)
+    },
+    removeRow (row, index) {
+      this.$emit('on-row-remove', row, index)
     }
   },
   watch: {
