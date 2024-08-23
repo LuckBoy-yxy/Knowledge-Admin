@@ -44,7 +44,7 @@ import dayjs from 'dayjs'
 
 import Tables from '_c/tables'
 
-import { getTabData } from '@/api/content'
+import { getTabData, deletePostById } from '@/api/content'
 
 export default {
   name: 'ContentManagement',
@@ -229,7 +229,18 @@ export default {
         title: `确定删除帖子吗?`,
         content: `删除第 ${index + 1} 条, 标题为 ${row.title} 的帖子吗?`,
         onOk: () => {
-          this.$Message.info('删除成功')
+          deletePostById(row._id).then(res => {
+            if (res.code === 200) {
+              console.log(res)
+              this.tableData = this.tableData.filter(item => {
+                return item._id !== row._id
+              })
+              this.$Message.success('删除成功')
+            }
+          }).catch(err => {
+            console.log(err)
+            this.$Message.error('删除失败')
+          })
         },
         onCancel: () => {
           this.$Message.info('取消操作')
