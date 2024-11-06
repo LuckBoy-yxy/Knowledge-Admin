@@ -8,3 +8,7 @@ export const getTabData = options => {
 export const deletePostById = id => {
   return request.get('/content/delete?id=' + id)
 }
+
+export const updatePostById = data => {
+  return request.post('/content/update-id', data)
+}

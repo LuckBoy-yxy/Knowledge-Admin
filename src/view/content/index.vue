@@ -36,6 +36,13 @@
         />
       </Row>
     </Card>
+
+    <EditModal
+      :item="currentItem"
+      :isShow="showEdit"
+      @changeEvent="handleStatusChange"
+      @eidtEvent="handleItemEdit"
+    />
   </div>
 </template>
 
@@ -43,13 +50,15 @@
 import dayjs from 'dayjs'
 
 import Tables from '_c/tables'
+import EditModal from './editModal.vue'
 
-import { getTabData, deletePostById } from '@/api/content'
+import { getTabData, deletePostById, updatePostById } from '@/api/content'
 
 export default {
   name: 'ContentManagement',
   components: {
-    Tables
+    Tables,
+    EditModal
   },
   data () {
     return {
@@ -191,6 +200,7 @@ export default {
         {
           title: '设置',
           fixed: 'right',
+          key: 'settings',
           width: 160,
           align: 'center',
           slot: 'action'
@@ -200,7 +210,10 @@ export default {
       page: 1,
       pageSize: 10,
       total: 40,
-      pageArr: [10, 20, 30, 50, 100]
+      pageArr: [10, 20, 30, 50, 100],
+      showEdit: false,
+      currentItem: {},
+      currentIndex: 0
     }
   },
   methods: {
@@ -222,7 +235,24 @@ export default {
       this._getTabData()
     },
     handleRowEdit (row, index) {
-      console.log(row, index)
+      this.showEdit = true
+      this.currentIndex = index
+      this.currentItem = { ...row }
+    },
+    handleItemEdit (newValue) {
+      this.showEdit = false
+      updatePostById(newValue).then(res => {
+        if (res.code === 200) {
+          // this.tableData[this.currentIndex] = newValue
+          this.tableData.splice(this.currentIndex, 1, newValue)
+          this.$Message.success(res.msg)
+        } else {
+          this.$Message.error(res.msg)
+        }
+      })
+    },
+    handleStatusChange (value) {
+      this.showEdit = value
     },
     handleRowRemove (row, index) {
       this.$Modal.confirm({
@@ -231,7 +261,6 @@ export default {
         onOk: () => {
           deletePostById(row._id).then(res => {
             if (res.code === 200) {
-              console.log(res)
               this.tableData = this.tableData.filter(item => {
                 return item._id !== row._id
               })
