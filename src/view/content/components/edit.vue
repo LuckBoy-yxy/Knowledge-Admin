@@ -54,12 +54,27 @@
             :max="1000"
           ></Slider>
         </FormItem>
+
+        <FormItem label="标签">
+          <Select
+            v-model="formatTags"
+            multiple
+          >
+            <Option
+              v-for="(item, index) in tagsList"
+              :value="item.tagName"
+              :key="'tags' + index"
+            >{{ item.tagName }}</Option>
+          </Select>
+        </FormItem>
       </Form>
     </Modal>
   </div>
 </template>
 
 <script>
+import { getTags } from '@/api/content'
+
 export default {
   name: 'EditModal',
   props: {
@@ -90,8 +105,12 @@ export default {
         isTop: '0',
         sort: 'created',
         tags: []
-      }
+      },
+      tagsList: []
     }
+  },
+  mounted () {
+    this._getTags()
   },
   computed: {
     formatFav: {
@@ -101,9 +120,33 @@ export default {
       set (value) {
         this.localItem.fav = value
       }
+    },
+    formatTags: {
+      get () {
+        return this.localItem.tags.map(tag => tag.name)
+      },
+      set (value) {
+        console.log(value)
+        const arr = this.tagsList.filter(item => {
+          return value.indexOf(item.tagName) !== -1
+        })
+        this.localItem.tags = arr.map(tag => {
+          return {
+            name: tag.tagName,
+            class: tag.Class
+          }
+        })
+      }
     }
   },
   methods: {
+    _getTags () {
+      getTags().then(res => {
+        if (res.code === 200) {
+          this.tagsList = res.data
+        }
+      })
+    },
     ok () {
       this.$emit('eidtEvent', this.localItem)
     },

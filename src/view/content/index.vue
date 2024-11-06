@@ -50,7 +50,7 @@
 import dayjs from 'dayjs'
 
 import Tables from '_c/tables'
-import EditModal from './editModal.vue'
+import EditModal from './components/edit.vue'
 
 import { getTabData, deletePostById, updatePostById } from '@/api/content'
 

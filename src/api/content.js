@@ -12,3 +12,19 @@ export const deletePostById = id => {
 export const updatePostById = data => {
   return request.post('/content/update-id', data)
 }
+
+export const getTags = options => {
+  return request.get('/admin/get-tags?' + qs.stringify(options))
+}
+
+export const addTag = data => {
+  return request.post('/admin/add-tag', data)
+}
+
+export const removeTag = id => {
+  return request.get(`/admin/remove-tag/${id}`)
+}
+
+export const updateTag = data => {
+  return request.post('/admin/edit-tag', data)
+}
