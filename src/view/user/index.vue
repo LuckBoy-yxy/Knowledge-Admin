@@ -11,6 +11,7 @@
         @on-row-edit="handleRowEdit"
         @on-row-remove="handleRowRemove"
       />
+
       <Row
         type="flex"
         justify="space-between"
@@ -47,7 +48,9 @@
 <script>
 import Tables from '_c/tables'
 
-// import dayjs from 'dayjs'
+import dayjs from 'dayjs'
+
+import { getUserList } from '@/api/admin'
 
 export default {
   name: 'UserManagement',
@@ -64,25 +67,32 @@ export default {
         },
         {
           title: '用户昵称',
-          key: 'user',
-          minWidth: 140
+          key: 'name',
+          minWidth: 140,
+          align: 'center'
         },
         {
           title: '登录名',
           key: 'username',
-          minWidth: 140
+          minWidth: 300,
+          align: 'center'
         },
         {
           title: '角色',
           key: 'roles',
           align: 'center',
-          minWidth: 30
+          minWidth: 400,
+          render: (h, params) => {
+            return h('div', [
+              h('span', params.row.roles.join(','))
+            ])
+          }
         },
         {
           title: '积分',
           key: 'favs',
           align: 'center',
-          minWidth: 60
+          minWidth: 150
         },
         {
           title: '是否禁用',
@@ -109,7 +119,13 @@ export default {
         {
           title: '创建时间',
           key: 'created',
-          minWidth: 140
+          minWidth: 200,
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('span', dayjs(params.row.created).format('YYYY-MM-DD hh:mm:ss'))
+            ])
+          }
         },
         {
           title: '设置',
@@ -127,7 +143,21 @@ export default {
       pageArr: [10, 20, 30, 50, 100]
     }
   },
+  mounted () {
+    this._getList()
+  },
   methods: {
+    _getList () {
+      getUserList({
+        page: this.page,
+        pageSize: this.pageSize
+      }).then(res => {
+        if (res.code === 200) {
+          this.tableData = res.data
+          this.total = res.total
+        }
+      })
+    },
     onPageChange (page) {
 
     },
