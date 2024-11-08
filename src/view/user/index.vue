@@ -42,11 +42,19 @@
         </Col>
       </Row>
     </Card>
+
+    <Edit
+      :isShow="isShow"
+      :item="currentItem"
+      @eidtEvent="handleEdit"
+      @changeEvent="handleCancel"
+    />
   </div>
 </template>
 
 <script>
 import Tables from '_c/tables'
+import Edit from './edit.vue'
 
 import dayjs from 'dayjs'
 
@@ -55,7 +63,8 @@ import { getUserList } from '@/api/admin'
 export default {
   name: 'UserManagement',
   components: {
-    Tables
+    Tables,
+    Edit
   },
   data () {
     return {
@@ -140,7 +149,10 @@ export default {
       page: 1,
       pageSize: 10,
       total: 0,
-      pageArr: [10, 20, 30, 50, 100]
+      pageArr: [10, 20, 30, 50, 100],
+      isShow: false,
+      currentItem: {},
+      currentIndex: 0
     }
   },
   mounted () {
@@ -165,10 +177,19 @@ export default {
 
     },
     handleRowEdit (row, index) {
-
+      this.isShow = true
+      this.currentIndex = index
+      this.currentItem = { ...row }
+    },
+    handleCancel (value) {
+      this.isShow = value
     },
     handleRowRemove (row, index) {
 
+    },
+    handleEdit (value) {
+      this.isShow = false
+      console.log(value)
     },
     handleSelectAll () {
 
