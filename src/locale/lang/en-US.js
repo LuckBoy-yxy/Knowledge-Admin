@@ -46,5 +46,6 @@ export default {
   article_management: 'Article Management',
   content_management: 'Content Management',
   tags_management: 'Tags Management',
+  user: 'user',
   user_management: 'User Management'
 }

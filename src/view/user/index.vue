@@ -1,11 +1,13 @@
 <template>
   <div>
     <Card>
-      <tables
-        ref="tables"
+      <!--
         editable
         searchable
         search-place="top"
+      -->
+      <tables
+        ref="tables"
         v-model="tableData"
         :columns="columns"
         @on-row-edit="handleRowEdit"
@@ -58,7 +60,7 @@ import Edit from './edit.vue'
 
 import dayjs from 'dayjs'
 
-import { getUserList } from '@/api/admin'
+import { getUserList, updateUserById, deleteUserById } from '@/api/admin'
 
 export default {
   name: 'UserManagement',
@@ -171,10 +173,12 @@ export default {
       })
     },
     onPageChange (page) {
-
+      this.page = page
+      this._getList()
     },
     onPageSizeChange (pageSize) {
-
+      this.pageSize = pageSize
+      this._getList()
     },
     handleRowEdit (row, index) {
       this.isShow = true
@@ -185,11 +189,39 @@ export default {
       this.isShow = value
     },
     handleRowRemove (row, index) {
-
+      this.$Modal.confirm({
+        title: `确定删除此用户吗?`,
+        content: `删除 ${row.name} 用户吗?`,
+        onOk: () => {
+          deleteUserById(row._id).then(res => {
+            if (res.code === 200) {
+              // this.tableData = this.tableData.filter(item => {
+              //   return item._id !== row._id
+              // })
+              // this.tableData.splice(this.currentIndex, 1)
+              this.tableData.splice(index, 1)
+              this.$Message.success('删除成功')
+            }
+          }).catch(err => {
+            console.log(err)
+            this.$Message.error('删除失败')
+          })
+        },
+        onCancel: () => {
+          this.$Message.info('取消操作')
+        }
+      })
     },
     handleEdit (value) {
       this.isShow = false
-      console.log(value)
+      updateUserById(value).then(res => {
+        if (res.code === 200) {
+          this.tableData.splice(this.currentIndex, 1, value)
+          this.$Message.success(res.msg)
+        } else {
+          this.$Message.error(res.msg)
+        }
+      })
     },
     handleSelectAll () {
 

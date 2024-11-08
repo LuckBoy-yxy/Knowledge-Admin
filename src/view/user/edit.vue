@@ -79,20 +79,49 @@
 </template>
 
 <script>
+import { checkUserName } from '@/api/admin'
+
+// const favPassCheck = (rule, value, callback) => {
+//   if (!value.trim()) {
+//     return callback(new Error('请输入用户积分'))
+//   }
+//   if (!/^[1-9]\d*$/.test(value)) {
+//     return callback(new Error('请输入正确的数值'))
+//   }
+
+//   const fav = +value
+//   if (fav % 10 === 0) {
+//     callback()
+//   } else {
+//     callback(new Error('输入的积分数需被 10 整除'))
+//   }
+// }
+
 const favPassCheck = (rule, value, callback) => {
-  if (!value.trim()) {
+  if (!value) {
     return callback(new Error('请输入用户积分'))
   }
   if (!/^[1-9]\d*$/.test(value)) {
-    return callback(new Error('请输入正确的数值'))
+    callback(new Error('请输入正确的数值'))
   }
-
-  const fav = +value
-  if (fav % 10 === 0) {
+  const result = parseInt(value)
+  if (result % 10 === 0) {
     callback()
   } else {
-    callback(new Error('输入的积分数需被 10 整除'))
+    callback(new Error('请输入可以除以10的整数'))
   }
+}
+
+const userNamePassCheck = (rule, value, callback) => {
+  checkUserName(value).then(res => {
+    if (res.code === 200) {
+      if (res.data === 1) {
+        callback()
+      } else {
+        callback(new Error('登录名已存在'))
+      }
+    }
+  })
 }
 
 export default {
@@ -119,7 +148,6 @@ export default {
         isVip: '0',
         favs: 0
       },
-      tagsList: [],
       ruleValidate: {
         name: [
           { required: true, message: '请输入用户昵称', trigger: 'blur' },
@@ -128,7 +156,8 @@ export default {
         ],
         username: [
           { required: true, message: '请输入登录名', trigger: 'blur' },
-          { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+          { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' },
+          { validator: userNamePassCheck, trigger: 'blur' }
         ],
         password: [
           // { required: true, message: '请输入密码', trigger: 'blur' },
@@ -158,14 +187,14 @@ export default {
   methods: {
     ok () {
       this.$refs.form.validate(valid => {
-        if (!valid) {
-          this.$Message.error('请检查表单信息是否正确')
+        if (valid) {
+          this.loading = false
+          this.$emit('eidtEvent', this.localItem)
+        } else {
           this.loading = false
           this.$nextTick(() => (this.loading = true))
-          return
+          this.$Message.error('请检查表单信息是否正确')
         }
-        this.$emit('eidtEvent', this.localItem)
-        this.loading = false
       })
     },
     cancel () {
