@@ -70,6 +70,12 @@
       @AddEvent="submitAddUser"
       @AddCancelEvent="handleAddCancel"
     />
+
+    <BatchSet
+      :isShow="showSet"
+      @batchSetEvent="handleBatchSet"
+      @batchCencelEvent="handleBatchCancel"
+    />
   </div>
 </template>
 
@@ -77,6 +83,7 @@
 import Tables from '_c/tables'
 import Edit from './edit.vue'
 import Add from './add.vue'
+import BatchSet from './batchSet.vue'
 
 import dayjs from 'dayjs'
 
@@ -92,7 +99,8 @@ export default {
   components: {
     Tables,
     Edit,
-    Add
+    Add,
+    BatchSet
   },
   data () {
     return {
@@ -182,7 +190,8 @@ export default {
       currentItem: {},
       currentIndex: 0,
       showAdd: false,
-      selection: []
+      selection: [],
+      showSet: false
     }
   },
   mounted () {
@@ -295,7 +304,14 @@ export default {
       })
     },
     handleSetBath () {
-      console.log('set')
+      this.showSet = true
+    },
+    handleBatchSet (formData) {
+      this.showSet = false
+      console.log(formData)
+    },
+    handleBatchCancel (value) {
+      this.showSet = value
     },
     exportExcel () {
       this.$refs.tables.exportCsv({
