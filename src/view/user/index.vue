@@ -67,6 +67,7 @@
     />
 
     <Add
+      ref="addModel"
       :isShow="showAdd"
       @AddEvent="submitAddUser"
       @AddCancelEvent="handleAddCancel"
@@ -258,9 +259,11 @@ export default {
       this.showAdd = false
       addUser(formData).then(res => {
         if (res.code === 200) {
-          this.tableData.splice(this.tableData.length, 0, res.data)
+          // this.tableData.splice(this.tableData.length, 0, res.data)
+          this.tableData.splice(0, 0, res.data)
           this.$Message.success(res.msg)
           this.total++
+          this.$refs.addModel.cancel()
         }
       })
     },

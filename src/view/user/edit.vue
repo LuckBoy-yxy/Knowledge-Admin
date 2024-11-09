@@ -112,7 +112,11 @@ const favPassCheck = (rule, value, callback) => {
   }
 }
 
-const userNamePassCheck = (rule, value, callback) => {
+const userNamePassCheck = (rule, value, callback, vm) => {
+  if (vm.item.username === vm.localItem.username) {
+    callback()
+    return
+  }
   checkUserName(value).then(res => {
     if (res.code === 200) {
       if (res.data === 1) {
@@ -157,7 +161,8 @@ export default {
         username: [
           { required: true, message: '请输入登录名', trigger: 'blur' },
           { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' },
-          { validator: userNamePassCheck, trigger: 'blur' }
+          // { validator: userNamePassCheck, trigger: 'blur' }
+          { validator: (rule, value, callback) => userNamePassCheck(rule, value, callback, this), trigger: 'blur' }
         ],
         password: [
           // { required: true, message: '请输入密码', trigger: 'blur' },
@@ -191,7 +196,8 @@ export default {
   },
   watch: {
     item (newVal, oldVal) {
-      this.localItem = newVal
+      // this.localItem = newVal
+      this.localItem = { ...newVal }
     },
     isShow (newVal, oldVal) {
       this.showStatus = newVal

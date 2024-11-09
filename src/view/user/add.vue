@@ -148,7 +148,7 @@ export default {
         mobile: '',
         gender: '0',
         status: '0',
-        isVip: '1',
+        isVip: '0',
         favs: 100,
         location: '',
         regmark: ''
