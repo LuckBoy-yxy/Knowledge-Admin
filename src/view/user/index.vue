@@ -8,13 +8,11 @@
       -->
       <tables
         ref="tables"
-        editable
-        searchable
-        search-place="top"
         v-model="tableData"
         :columns="columns"
         @on-row-edit="handleRowEdit"
         @on-row-remove="handleRowRemove"
+        @on-selection-change="handleSelect"
       >
         <template v-slot:table-header>
           <Button
@@ -34,8 +32,8 @@
         align="middle"
       >
         <Col class="ctrls">
-          <Button @click="handleSelectAll(true)">批量全选</Button>
-          <Button @click="handleSelectAll(false)">取消全选</Button>
+          <Button @click="handleDeleteBath">批量删除</Button>
+          <Button @click="handleSetBath">批量设置</Button>
           <Button
             style="margin: 10px 0;"
             type="primary"
@@ -183,7 +181,8 @@ export default {
       isShow: false,
       currentItem: {},
       currentIndex: 0,
-      showAdd: false
+      showAdd: false,
+      selection: []
     }
   },
   mounted () {
@@ -270,8 +269,33 @@ export default {
     handleAddCancel (value) {
       this.showAdd = value
     },
-    handleSelectAll () {
-
+    handleSelect (selection) {
+      this.selection = selection
+    },
+    handleDeleteBath () {
+      if (this.selection.length === 0) {
+        return this.$Message.info('请选择需要批量删除的表格数据')
+      }
+      // const content = this.selection.map(item => (item.username)).join(',')
+      this.$Modal.confirm({
+        title: '确定要执行批量删除吗?',
+        // content: `删除${content}用户`,
+        onOk: () => {
+          const arr = this.selection.map(item => item._id)
+          deleteUserById(arr).then(res => {
+            if (res.code === 200) {
+              this.tableData = this.tableData.filter(item => !arr.includes(item._id))
+              this.$Message.success('批量删除成功')
+            }
+          })
+        },
+        onCancel: () => {
+          this.$Message.info('取消批量删除')
+        }
+      })
+    },
+    handleSetBath () {
+      console.log('set')
     },
     exportExcel () {
       this.$refs.tables.exportCsv({
