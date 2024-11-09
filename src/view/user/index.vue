@@ -72,6 +72,7 @@
     />
 
     <BatchSet
+      ref="batchSet"
       :isShow="showSet"
       @batchSetEvent="handleBatchSet"
       @batchCencelEvent="handleBatchCancel"
@@ -91,7 +92,8 @@ import {
   getUserList,
   updateUserById,
   deleteUserById,
-  addUser
+  addUser,
+  updateUserBatchById
 } from '@/api/admin'
 
 export default {
@@ -304,11 +306,38 @@ export default {
       })
     },
     handleSetBath () {
+      if (this.selection.length === 0) {
+        return this.$Message.info('请选择要设置的用户')
+      }
       this.showSet = true
     },
     handleBatchSet (formData) {
       this.showSet = false
-      console.log(formData)
+      const arr = this.selection.map(item => item._id)
+      this.$Modal.confirm({
+        title: '确定要修改选中用户的设置吗?',
+        onOk: () => {
+          updateUserBatchById({
+            ids: arr,
+            formData
+          }).then(res => {
+            if (res.code === 200) {
+              this.tableData = this.tableData.map(item => {
+                if (arr.includes(item._id)) {
+                  for (let key of Object.keys(formData)) {
+                    item[key] = formData[key]
+                  }
+                }
+              })
+              this.$Message.info('批量设置成功')
+              this.$refs.batchSet.cancel()
+            }
+          })
+        },
+        onCanel: () => {
+          this.$Message.info('取消批量设置')
+        }
+      })
     },
     handleBatchCancel (value) {
       this.showSet = value

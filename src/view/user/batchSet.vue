@@ -64,10 +64,20 @@ export default {
   },
   methods: {
     ok () {
+      if (!this.localItem.roles.length) {
+        this.localItem.roles.push('user')
+      }
       this.$emit('batchSetEvent', this.localItem)
     },
     cancel () {
       this.$emit('batchCencelEvent', false)
+      Object.keys(this.localItem).forEach(key => {
+        if (key === 'roles') {
+          this.localItem[key] = []
+        } else {
+          this.localItem[key] = '0'
+        }
+      })
     }
   },
   watch: {

@@ -9,6 +9,10 @@ export const updateUserById = data => {
   return request.post('/admin/update-user', data)
 }
 
+export const updateUserBatchById = data => {
+  return request.post('/admin/update-users-set', data)
+}
+
 // export const deleteUserById = id => {
 //   return request.get(`/admin/delete-user/${id}`)
 // }
