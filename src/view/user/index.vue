@@ -8,11 +8,25 @@
       -->
       <tables
         ref="tables"
+        editable
+        searchable
+        search-place="top"
         v-model="tableData"
         :columns="columns"
         @on-row-edit="handleRowEdit"
         @on-row-remove="handleRowRemove"
-      />
+      >
+        <template v-slot:table-header>
+          <Button
+            class="search-btn"
+            type="primary"
+            @click="handleAddUser"
+          >
+            <Icon type="md-person-add" />
+            添加用户
+          </Button>
+        </template>
+      </tables>
 
       <Row
         type="flex"
@@ -51,22 +65,35 @@
       @eidtEvent="handleEdit"
       @changeEvent="handleCancel"
     />
+
+    <Add
+      :isShow="showAdd"
+      @AddEvent="submitAddUser"
+      @AddCancelEvent="handleAddCancel"
+    />
   </div>
 </template>
 
 <script>
 import Tables from '_c/tables'
 import Edit from './edit.vue'
+import Add from './add.vue'
 
 import dayjs from 'dayjs'
 
-import { getUserList, updateUserById, deleteUserById } from '@/api/admin'
+import {
+  getUserList,
+  updateUserById,
+  deleteUserById,
+  addUser
+} from '@/api/admin'
 
 export default {
   name: 'UserManagement',
   components: {
     Tables,
-    Edit
+    Edit,
+    Add
   },
   data () {
     return {
@@ -154,7 +181,8 @@ export default {
       pageArr: [10, 20, 30, 50, 100],
       isShow: false,
       currentItem: {},
-      currentIndex: 0
+      currentIndex: 0,
+      showAdd: false
     }
   },
   mounted () {
@@ -222,6 +250,22 @@ export default {
           this.$Message.error(res.msg)
         }
       })
+    },
+    handleAddUser () {
+      this.showAdd = true
+    },
+    submitAddUser (formData) {
+      this.showAdd = false
+      addUser(formData).then(res => {
+        if (res.code === 200) {
+          this.tableData.splice(this.tableData.length, 0, res.data)
+          this.$Message.success(res.msg)
+          this.total++
+        }
+      })
+    },
+    handleAddCancel (value) {
+      this.showAdd = value
     },
     handleSelectAll () {
 

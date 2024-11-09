@@ -16,3 +16,7 @@ export const deleteUserById = id => {
 export const checkUserName = username => {
   return request.get('/admin/check-username?username=' + username)
 }
+
+export const addUser = data => {
+  return request.post('/admin/add-user', data)
+}

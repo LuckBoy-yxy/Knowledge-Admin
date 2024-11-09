@@ -2,77 +2,91 @@
   <div>
     <Modal
       v-model="showStatus"
-      title="编辑用户信息"
+      title="新增用户"
       @on-ok="ok"
       @on-cancel="cancel"
       :loading="loading"
     >
       <Form
         ref="form"
-        :model="localItem"
+        :model="formData"
         :label-width="80"
         :rules="ruleValidate"
       >
-        <FormItem label="用户昵称" prop="name">
+        <FormItem label="登录名" prop="username">
           <Input
-            v-model="localItem.name"
-            placeholder="请输入用户昵称"
+            prefix="md-mail"
+            v-model="formData.username"
+            placeholder="请输入登录名(邮箱)"
           ></Input>
         </FormItem>
 
-        <FormItem label="登录名" prop="username">
+        <FormItem label="用户昵称" prop="name">
           <Input
-            v-model="localItem.username"
-            placeholder="请输入登录名"
+            prefix="md-person"
+            v-model="formData.name"
+            placeholder="请输入用户昵称"
           ></Input>
         </FormItem>
 
         <FormItem label="密码" prop="password">
           <Input
-            v-model="localItem.password"
+            prefix="md-lock"
+            v-model="formData.password"
             placeholder="请输入密码"
           ></Input>
         </FormItem>
 
+        <FormItem label="性别">
+          <RadioGroup v-model="formData.gender">
+            <Radio label="0">男</Radio>
+            <Radio label="1">女</Radio>
+          </RadioGroup>
+        </FormItem>
+
+        <FormItem label="手机号" prop="mobile">
+          <Input
+            v-model="formData.mobile"
+            placeholder="请输入手机号"
+          ></Input>
+        </FormItem>
+
+        <FormItem label="所在城市">
+          <Input
+            prefix="md-pin"
+            v-model="formData.location"
+            placeholder="请输入所在城市"
+          ></Input>
+        </FormItem>
+
         <FormItem label="是否禁用">
-          <RadioGroup v-model="localItem.status">
+          <RadioGroup v-model="formData.status">
             <Radio label="0">否</Radio>
             <Radio label="1">是</Radio>
           </RadioGroup>
         </FormItem>
 
         <FormItem label="是否是VIP">
-          <RadioGroup v-model="localItem.isVip">
+          <RadioGroup v-model="formData.isVip">
             <Radio label="0">否</Radio>
             <Radio label="1">是</Radio>
           </RadioGroup>
         </FormItem>
 
         <FormItem label="用户积分" prop="favs">
-          <!-- <Slider
-            v-model="formatFav"
-            show-input
-            :step="10"
-            :max="1000"
-          ></Slider> -->
           <Input
-            v-model="localItem.favs"
+            v-model="formData.favs"
             style="width: 100px"
           />
         </FormItem>
 
-        <!-- <FormItem label="标签">
-          <Select
-            v-model="formatTags"
-            multiple
-          >
-            <Option
-              v-for="(item, index) in tagsList"
-              :value="item.tagName"
-              :key="'tags' + index"
-            >{{ item.tagName }}</Option>
-          </Select>
-        </FormItem> -->
+        <FormItem label="个性签名">
+          <Input
+            type="textarea"
+            v-model="formData.regmark"
+            placeholder="请输入个性签名"
+          ></Input>
+        </FormItem>
       </Form>
     </Modal>
   </div>
@@ -80,37 +94,6 @@
 
 <script>
 import { checkUserName } from '@/api/admin'
-
-// const favPassCheck = (rule, value, callback) => {
-//   if (!value.trim()) {
-//     return callback(new Error('请输入用户积分'))
-//   }
-//   if (!/^[1-9]\d*$/.test(value)) {
-//     return callback(new Error('请输入正确的数值'))
-//   }
-
-//   const fav = +value
-//   if (fav % 10 === 0) {
-//     callback()
-//   } else {
-//     callback(new Error('输入的积分数需被 10 整除'))
-//   }
-// }
-
-const favPassCheck = (rule, value, callback) => {
-  if (!value) {
-    return callback(new Error('请输入用户积分'))
-  }
-  if (!/^[1-9]\d*$/.test(value)) {
-    callback(new Error('请输入正确的数值'))
-  }
-  const result = parseInt(value)
-  if (result % 10 === 0) {
-    callback()
-  } else {
-    callback(new Error('请输入可以除以10的整数'))
-  }
-}
 
 const userNamePassCheck = (rule, value, callback) => {
   checkUserName(value).then(res => {
@@ -124,29 +107,51 @@ const userNamePassCheck = (rule, value, callback) => {
   })
 }
 
+const mobilePassCheck = (rule, value, callback) => {
+  if (!/^1[3456789]\d{9}$/.test(value)) {
+    callback(new Error('请输入正确的手机号'))
+  } else {
+    callback()
+  }
+}
+
+const favPassCheck = (rule, value, callback) => {
+  if (!value) {
+    return callback(new Error('请输入用户积分'))
+  }
+  if (!/^[1-9]\d*$/.test(value)) {
+    callback(new Error('请输入正确的数值'))
+  }
+  if (+value % 10 !== 0) {
+    callback(new Error('请输入可以除以10的整数'))
+  } else {
+    callback()
+  }
+}
+
 export default {
-  name: 'EditModal',
+  name: 'AddModal',
   props: {
     isShow: {
       type: Boolean,
       default: false
-    },
-    item: {
-      type: Object,
-      default: () => {}
     }
   },
   data () {
     return {
       showStatus: false,
       loading: true,
-      localItem: {
+      formData: {
         name: '',
         username: '',
         password: '',
+        mobile: '',
+        gender: '0',
         status: '0',
-        isVip: '0',
-        favs: 0
+        isVip: '1',
+        favs: 100,
+        location: '',
+        regmark: ''
       },
       ruleValidate: {
         name: [
@@ -160,12 +165,15 @@ export default {
           { validator: userNamePassCheck, trigger: 'blur' }
         ],
         password: [
-          // { required: true, message: '请输入密码', trigger: 'blur' },
+          { required: true, message: '请输入密码', trigger: 'blur' },
           { type: 'string', min: 6, message: '密码长度至少为 6 位', trigger: 'change' },
           { type: 'string', max: 20, message: '密码长度最多为 20 位', trigger: 'change' }
         ],
+        mobile: [
+          { required: true, message: '请输入手机号', trigger: 'blur' },
+          { validator: mobilePassCheck, trigger: 'blur' }
+        ],
         favs: [
-          // { required: true, message: '请输入用户积分', trigger: 'blur' },
           { validator: favPassCheck, trigger: 'change' }
         ]
       }
@@ -176,7 +184,10 @@ export default {
       this.$refs.form.validate(valid => {
         if (valid) {
           this.loading = false
-          this.$emit('eidtEvent', this.localItem)
+          if (!this.formData.regmark) {
+            this.formData.regmark = '用户很懒, 什么都没留下~~~'
+          }
+          this.$emit('AddEvent', this.formData)
         } else {
           this.loading = false
           this.$nextTick(() => (this.loading = true))
@@ -185,14 +196,23 @@ export default {
       })
     },
     cancel () {
-      this.$emit('changeEvent', false)
+      this.$emit('AddCancelEvent', false)
+      Object.keys(this.formData).forEach(key => {
+        if (key === 'gender' || key === 'status' || key === 'isVip') {
+          this.formData[key] = '0'
+        } else if (key === 'favs') {
+          this.formData[key] = 100
+        } else {
+          this.formData[key] = ''
+        }
+      })
       this.$refs.form.resetFields()
     }
   },
   watch: {
-    item (newVal, oldVal) {
-      this.localItem = newVal
-    },
+    // isShow: (newVal, oldVal) => {
+    //   this.showStatus = newVal
+    // }
     isShow (newVal, oldVal) {
       this.showStatus = newVal
     }
