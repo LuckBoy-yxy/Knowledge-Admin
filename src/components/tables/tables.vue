@@ -1,11 +1,49 @@
 <template>
   <div>
-    <div v-if="searchable && searchPlace === 'top'" class="search-con search-con-top">
-      <Select v-model="searchKey" class="search-col">
-        <Option v-for="item in columns" v-if="item.key !== 'handle'" :value="item.key" :key="`search-col-${item.key}`">{{ item.title }}</Option>
+    <div
+      v-if="searchable && searchPlace === 'top'"
+      class="search-con search-con-top"
+    >
+      <!-- v-model="searchKey" -->
+      <Select
+        class="search-col"
+        @on-select="handleSelect"
+      >
+        <!-- <Option
+          v-for="item in columns"
+          v-if="item.key !== 'handle'"
+          :value="item.key"
+          :key="`search-col-${item.key}`"
+        >{{ item.title }}</Option> -->
+        <template v-for="(item, index) in columns">
+          <!-- :value="item" -->
+          <Option
+            v-if="!item.hidden"
+            :key="'search-col-' + item.key"
+            :value="index"
+          >{{ item.title }}</Option>
+        </template>
       </Select>
-      <Input @on-change="handleClear" clearable placeholder="输入关键字搜索" class="search-input" v-model="searchValue"/>
-      <Button @click="handleSearch" class="search-btn" type="primary"><Icon type="search"/>&nbsp;&nbsp;搜索</Button>
+
+      <!-- <Input
+        @on-change="handleClear"
+        clearable placeholder="输入关键字搜索"
+        class="search-input"
+        v-model="searchValue"
+      /> -->
+      <Search
+        :value="searchValue"
+        :item="chooseItem"
+        @chooseEvent="handleChoose"
+      />
+
+      <Button
+        @click="handleSearch"
+        class="search-btn"
+        type="primary"
+      >
+        <Icon type="search"/>&nbsp;&nbsp;搜索
+      </Button>
 
       <slot name="table-header"></slot>
     </div>
@@ -68,6 +106,7 @@
 <script>
 import TablesEdit from './edit.vue'
 import handleBtns from './handle-btns'
+import Search from './serach.vue'
 import './index.less'
 export default {
   name: 'Tables',
@@ -151,6 +190,9 @@ export default {
       default: 'top'
     }
   },
+  components: {
+    Search
+  },
   /**
    * Events
    * @on-start-edit 返回值 {Object} ：同iview中render函数中的params对象 { row, index, column }
@@ -159,6 +201,9 @@ export default {
    */
   data () {
     return {
+      chooseItem: {
+        tyep: 'input'
+      },
       insideColumns: [],
       insideTableData: [],
       edittingCellId: '',
@@ -168,6 +213,22 @@ export default {
     }
   },
   methods: {
+    handleSelect (index) {
+      // console.log(index)
+      // const value = this.columns[index]
+      const value = this.columns[index.value]
+      this.searchKey = value.key
+      this.chooseItem = value.search
+      this.searchValue = ['select', 'date'].includes(value.search.type) ? [] : ''
+    },
+    handleChoose (data) {
+      if (this.chooseItem.type === 'input') {
+        this.searchValue = data.target.value
+      } else {
+        this.searchValue = data
+      }
+      // console.log(this.searchValue)
+    },
     suportEdit (item, index) {
       item.render = (h, params) => {
         return h(TablesEdit, {
@@ -224,11 +285,13 @@ export default {
     setDefaultSearchKey () {
       this.searchKey = this.columns[0].key !== 'handle' ? this.columns[0].key : (this.columns.length > 1 ? this.columns[1].key : '')
     },
-    handleClear (e) {
-      if (e.target.value === '') this.insideTableData = this.value
-    },
     handleSearch () {
-      this.insideTableData = this.value.filter(item => item[this.searchKey].indexOf(this.searchValue) > -1)
+      // this.insideTableData = this.value.filter(item => item[this.searchKey].indexOf(this.searchValue)
+      this.$emit('searchEvent', {
+        // item: this.chooseItem,
+        item: this.searchKey,
+        search: this.searchValue
+      })
     },
     handleTableData () {
       this.insideTableData = this.value.map((item, index) => {
@@ -287,7 +350,7 @@ export default {
     },
     value (val) {
       this.handleTableData()
-      if (this.searchable) this.handleSearch()
+      // if (this.searchable) this.handleSearch()
     }
   },
   mounted () {

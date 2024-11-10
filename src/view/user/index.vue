@@ -1,18 +1,17 @@
 <template>
   <div>
     <Card>
-      <!--
-        editable
-        searchable
-        search-place="top"
-      -->
       <tables
         ref="tables"
         v-model="tableData"
         :columns="columns"
+        editable
+        searchable
+        search-place="top"
         @on-row-edit="handleRowEdit"
         @on-row-remove="handleRowRemove"
         @on-selection-change="handleSelect"
+        @searchEvent="handleSearch"
       >
         <template v-slot:table-header>
           <Button
@@ -110,19 +109,26 @@ export default {
         {
           type: 'selection',
           width: 60,
-          align: 'center'
+          align: 'center',
+          hidden: true
         },
         {
           title: '用户昵称',
           key: 'name',
           minWidth: 140,
-          align: 'center'
+          align: 'center',
+          search: {
+            type: 'input'
+          }
         },
         {
           title: '登录名',
           key: 'username',
           minWidth: 300,
-          align: 'center'
+          align: 'center',
+          search: {
+            type: 'input'
+          }
         },
         {
           title: '角色',
@@ -133,13 +139,31 @@ export default {
             return h('div', [
               h('span', params.row.roles.join(','))
             ])
+          },
+          search: {
+            type: 'select',
+            options: [
+              {
+                key: '超级管理员',
+                value: 'super_admin'
+              },
+              {
+                key: '管理员',
+                value: 'admin'
+              },
+              {
+                key: '普通用户',
+                value: 'user'
+              }
+            ]
           }
         },
         {
           title: '积分',
           key: 'favs',
           align: 'center',
-          minWidth: 150
+          minWidth: 150,
+          hidden: true
         },
         {
           title: '是否禁用',
@@ -150,6 +174,23 @@ export default {
             return h('div', [
               h('span', params.row.status === '0' ? '否' : '是')
             ])
+          },
+          search: {
+            type: 'radio',
+            options: [
+              {
+                key: '全部',
+                value: ''
+              },
+              {
+                key: '否',
+                value: '0'
+              },
+              {
+                key: '是',
+                value: '1'
+              }
+            ]
           }
         },
         {
@@ -161,6 +202,23 @@ export default {
             return h('div', [
               h('span', params.row.isVip === '0' ? '否' : '是')
             ])
+          },
+          search: {
+            type: 'radio',
+            options: [
+              {
+                key: '全部',
+                value: ''
+              },
+              {
+                key: '否',
+                value: '0'
+              },
+              {
+                key: '是',
+                value: '1'
+              }
+            ]
           }
         },
         {
@@ -172,6 +230,9 @@ export default {
             return h('div', [
               h('span', dayjs(params.row.created).format('YYYY-MM-DD hh:mm:ss'))
             ])
+          },
+          search: {
+            type: 'date'
           }
         },
         {
@@ -180,7 +241,8 @@ export default {
           fixed: 'right',
           width: 160,
           align: 'center',
-          slot: 'action'
+          slot: 'action',
+          hidden: true
         }
       ],
       tableData: [],
@@ -193,7 +255,8 @@ export default {
       currentIndex: 0,
       showAdd: false,
       selection: [],
-      showSet: false
+      showSet: false,
+      option: {}
     }
   },
   mounted () {
@@ -203,7 +266,8 @@ export default {
     _getList () {
       getUserList({
         page: this.page,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
+        option: this.option
       }).then(res => {
         if (res.code === 200) {
           this.tableData = res.data
@@ -341,6 +405,17 @@ export default {
     },
     handleBatchCancel (value) {
       this.showSet = value
+    },
+    handleSearch (value) {
+      // this.option === {}
+      // if ((this.option.search && this.option.search !== value.search) || Object.keys(this.option).length === 0) {
+      if ((typeof this.option.search !== 'undefined' && this.option.search !== value.search) || Object.keys(this.option).length === 0) {
+        this.page = 1
+      }
+      // console.log(this.page)
+      this.option = value
+      // console.log(this.option)
+      this._getList()
     },
     exportExcel () {
       this.$refs.tables.exportCsv({
