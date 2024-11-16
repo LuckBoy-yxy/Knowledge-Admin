@@ -2,22 +2,34 @@
   <div>
     <Row :gutter="10">
       <Col
-        span="5"
+        span="6"
         :sm="24"
         :md="9"
-        :lg="5"
+        :lg="6"
         style="margin-bottom: 10px;"
       >
         <Card dis-hover shadow>
+          <Row
+            type="flex"
+            align="middle"
+            justify="center"
+          >
+            <ButtonGroup class="btn-group">
+              <Button size="small" icon="md-add">新增</Button>
+              <Button size="small" type="primary" icon="ios-create">编辑</Button>
+              <Button size="small" type="error" icon="md-trash">删除</Button>
+            </ButtonGroup>
+          </Row>
+
           <Tree :data="data1"></Tree>
         </Card>
       </Col>
 
       <Col
-        span="19"
+        span="18"
         :sm="24"
         :md="15"
-        :lg="19"
+        :lg="18"
       >
         <Card
           dis-hover
@@ -27,7 +39,8 @@
           style="margin-bottom: 10px;"
         >
           <Form
-            ref="formValidate"
+            ref="form"
+            :disabled="!isEdit"
             :model="formData"
             :rules="formRules"
             :label-width="80"
@@ -126,7 +139,54 @@
           :title="$t('Resources')"
           icon="ios-send"
         >
-          <Table border ref="selection" :columns="columns4" :data="data2"></Table>
+          <Tables
+            ref="tables"
+            v-model="tableData"
+            :columns="columns"
+            editable
+            searchable
+            search-place="top"
+            @on-row-edit="handleRowEdit"
+            @on-row-remove="handleRowRemove"
+            @on-selection-change="handleSelect"
+            @searchEvent="handleSearch"
+          >
+            <template v-slot:table-header>
+              <Button
+                class="search-btn"
+                type="primary"
+                @click="handleAdd"
+              >
+                <Icon type="ios-paper-plane-outline" /> 添加资源
+              </Button>
+            </template>
+          </Tables>
+
+          <Row
+            type="flex"
+            justify="space-between"
+            align="middle"
+            style="margin-top: 10px;"
+          >
+            <Col class="ctrls">
+              <Button @click="handleDeleteBath">批量删除</Button>
+              <Button style="margin: 0 10px;" @click="handleSetBath">批量设置</Button>
+            </Col>
+
+            <Col>
+              <Page
+                :total="total"
+                show-elevator
+                show-sizer
+                show-total
+                :current="page"
+                :page-size="pageSize"
+                :page-size-opts="pageArr"
+                @on-change="onPageChange"
+                @on-page-size-change="onPageSizeChange"
+              />
+            </Col>
+          </Row>
         </Card>
       </Col>
     </Row>
@@ -134,10 +194,22 @@
 </template>
 
 <script>
+import Tables from '_c/tables'
+
 export default {
   name: 'MenuManagement',
+  components: {
+    Tables
+  },
   data () {
     return {
+      isEdit: false,
+      page: 1,
+      pageSize: 10,
+      pageArr: [10, 20, 30, 50, 100],
+      total: 0,
+      tableData: [],
+      seletcion: [],
       data1: [
         {
           title: 'parent 1',
@@ -194,56 +266,122 @@ export default {
           { required: true, message: '前端组件不得为空', trigger: 'blur' }
         ]
       },
-      columns4: [
+      columns: [
         {
           type: 'selection',
           width: 60,
           align: 'center'
         },
         {
-          title: 'Name',
-          key: 'name'
+          title: '资源名称',
+          key: 'name',
+          search: {
+            type: 'input'
+          }
         },
         {
-          title: 'Age',
-          key: 'age'
+          title: '资源路径',
+          key: 'path',
+          search: {
+            type: 'input'
+          }
         },
         {
-          title: 'Address',
-          key: 'address'
-        }
-      ],
-      data2: [
-        {
-          name: 'John Brown',
-          age: 18,
-          address: 'New York No. 1 Lake Park',
-          date: '2016-10-03'
+          title: '请求类型',
+          key: 'methods',
+          search: {
+            type: 'input'
+          }
         },
         {
-          name: 'Jim Green',
-          age: 24,
-          address: 'London No. 1 Lake Park',
-          date: '2016-10-01'
+          title: '资源类型',
+          key: 'type',
+          search: {
+            type: 'radio',
+            options: [
+              {
+                key: '全部',
+                value: ''
+              },
+              {
+                key: '接口',
+                value: 'api'
+              },
+              {
+                key: '按钮',
+                value: 'btn'
+              }
+            ]
+          }
         },
         {
-          name: 'Joe Black',
-          age: 30,
-          address: 'Sydney No. 1 Lake Park',
-          date: '2016-10-02'
+          title: '资源描述',
+          key: 'regmark',
+          search: {
+            type: 'input'
+          }
         },
         {
-          name: 'Jon Snow',
-          age: 26,
-          address: 'Ottawa No. 2 Lake Park',
-          date: '2016-10-04'
+          title: '设置',
+          key: 'settings',
+          fixed: 'right',
+          width: 160,
+          align: 'center',
+          slot: 'action',
+          hidden: true
         }
       ]
+    }
+  },
+  methods: {
+    onPageChange () {
+
+    },
+    onPageSizeChange () {
+
+    },
+    handleRowEdit () {
+
+    },
+    handleRowRemove () {
+
+    },
+    handleDeleteBath () {
+
+    },
+    handleSelect () {
+
+    },
+    handleSearch () {
+
+    },
+    handleAdd () {
+
+    },
+    handleSetBath () {
+
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<!-- scoped -->
+<style lang="less">
+@media screen and (max-width: 1200px) {
+  .btn-group {
+    .ivu-icon {
+      & + span {
+        display: none;
+      }
+    }
+  }
+}
 
+.btn-group {
+  .ivu-icon {
+    & + span {
+      margin-left: 0;
+    }
+  }
+}
 </style>
