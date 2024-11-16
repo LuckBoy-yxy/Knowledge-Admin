@@ -46,6 +46,10 @@ export default {
   article_management: '文章管理',
   content_management: '内容管理',
   tags_management: '标签管理',
-  user: '用户',
-  user_management: '用户管理'
+  user: '用户管理',
+  user_management: '用户管理',
+  menu: '系统菜单配置',
+  menu_management: '菜单管理',
+  roles: '角色权限管理',
+  roles_management: '角色权限'
 }

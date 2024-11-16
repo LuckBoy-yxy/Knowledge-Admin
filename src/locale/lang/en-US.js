@@ -47,5 +47,8 @@ export default {
   content_management: 'Content Management',
   tags_management: 'Tags Management',
   user: 'user',
-  user_management: 'User Management'
+  menu: 'menu',
+  user_management: 'User Management',
+  menu_management: 'Menu Management',
+  roles_management: 'Roles Management'
 }

@@ -202,7 +202,7 @@ export default {
   data () {
     return {
       chooseItem: {
-        tyep: 'input'
+        type: 'input'
       },
       insideColumns: [],
       insideTableData: [],
