@@ -40,7 +40,12 @@
                 @click="editMenu"
               >编辑</Button>
 
-              <Button size="small" type="error" icon="md-trash">删除</Button>
+              <Button
+                size="small"
+                type="error"
+                icon="md-trash"
+                @click="deleteMenu"
+              >删除</Button>
             </ButtonGroup>
           </Row>
 
@@ -344,6 +349,37 @@ export default {
         this.formData = { ...this.selectNode[0] }
       } else {
         this.$Message.info('请选择菜单节点后, 再编辑')
+      }
+    },
+    deleteMenu () {
+      if (this.selectNode.length > 0) {
+        this.$Modal.confirm({
+          title: '确定删除吗?',
+          content: `删除 ${this.selectNode[0].title} 菜单项吗?`,
+          onOk: () => {
+            const deleteNode = (tree, node) => {
+              for (let i = 0; i < tree.length; i++) {
+                const currentNode = tree[i]
+                if (currentNode.nodeKey === node.nodeKey) {
+                  tree.splice(i, 1)
+                  return tree
+                } else {
+                  if (tree.children && tree.children.length > 0) {
+                    deleteNode(tree.children, node)
+                  }
+                }
+              }
+              return tree
+            }
+            this.menuData = deleteNode(this.menuData, this.selectNode[0])
+            this.selectNode = []
+          },
+          onCancel: () => {
+            this.$Message.info('操作取消')
+          }
+        })
+      } else {
+        this.$Message.info('请选择菜单节点后, 再删除')
       }
     },
     handleTreeSelect (item) {
