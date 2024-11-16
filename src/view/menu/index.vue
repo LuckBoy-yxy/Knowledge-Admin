@@ -25,7 +25,10 @@
                   </a>
                   <DropdownMenu slot="list">
                     <DropdownItem name="bro">兄弟节点</DropdownItem>
-                    <DropdownItem name="child">子节点</DropdownItem>
+                    <DropdownItem
+                      name="child"
+                      :disabled="menuData.length === 0"
+                    >子节点</DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
               </Button>
@@ -41,7 +44,7 @@
             </ButtonGroup>
           </Row>
 
-          <Tree :data="data1" @on-select-change="handleTreeSelect"></Tree>
+          <Tree :data="menuData" @on-select-change="handleTreeSelect"></Tree>
         </Card>
       </Col>
 
@@ -146,9 +149,9 @@
               />
             </FormItem>
 
-            <FormItem>
-              <Button type="primary" @click="handleSubmit('formValidate')">Submit</Button>
-              <Button @click="handleReset('formValidate')" style="margin-left: 8px">Reset</Button>
+            <FormItem v-if="isEdit">
+              <Button type="primary" @click="submit">确定</Button>
+              <Button @click="cancel" style="margin-left: 8px">取消</Button>
             </FormItem>
           </Form>
         </Card>
@@ -216,6 +219,8 @@
 <script>
 import Tables from '_c/tables'
 
+import { sortObj } from '../../libs/util'
+
 export default {
   name: 'MenuManagement',
   components: {
@@ -231,38 +236,8 @@ export default {
       total: 0,
       tableData: [],
       seletcion: [],
-      data1: [
-        {
-          title: 'parent 1',
-          expand: true,
-          children: [
-            {
-              title: 'parent 1-1',
-              expand: true,
-              children: [
-                {
-                  title: 'leaf 1-1-1'
-                },
-                {
-                  title: 'leaf 1-1-2'
-                }
-              ]
-            },
-            {
-              title: 'parent 1-2',
-              expand: true,
-              children: [
-                {
-                  title: 'leaf 1-2-1'
-                },
-                {
-                  title: 'leaf 1-2-1'
-                }
-              ]
-            }
-          ]
-        }
-      ],
+      type: '',
+      menuData: [],
       formData: {
         name: '',
         path: '',
@@ -356,8 +331,8 @@ export default {
   },
   methods: {
     addMenu (type) {
-      console.log(type)
-      if (this.selectNode.length > 0) {
+      this.type = type
+      if (this.selectNode.length > 0 || this.menuData.length === 0) {
         this.isEdit = true
       } else {
         this.$Message.info('请选择菜单节点后, 再添加')
@@ -372,7 +347,6 @@ export default {
     },
     handleTreeSelect (item) {
       this.selectNode = item
-      console.log(item)
     },
     onPageChange () {
 
@@ -399,6 +373,79 @@ export default {
 
     },
     handleSetBath () {
+
+    },
+    initFields () {
+      this.isEdit = false
+      this.$refs.form.resetFields()
+      this.formData = {
+        name: '',
+        path: '',
+        component: '',
+        hideInBread: false,
+        hideInMenu: false,
+        notCache: false,
+        icon: '',
+        sort: 0,
+        redirect: '',
+        type: 'menu',
+        operations: []
+      }
+    },
+    submit () {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          const data = {
+            title: this.formData.name,
+            ...this.formData,
+            expand: true
+          }
+          if (this.type === 'bro') {
+            if (this.menuData.length === 0) {
+              this.menuData.push(data)
+              // this.isEdit = false
+              // this.$refs.form.resetFields()
+            } else {
+              const selectNode = this.selectNode[0]
+              const getMenu = (parent, select) => {
+                for (let i = 0; i < parent.length; i++) {
+                  const item = parent[i]
+                  if (item.name === select.name) {
+                    parent.push(data)
+                    parent = sortObj(parent, 'sort')
+                    return parent
+                  } else {
+                    if (item.children && item.children.length > 0) {
+                      getMenu(item.children, select)
+                    }
+                  }
+                }
+                return parent
+              }
+              this.menuData = getMenu(this.menuData, selectNode)
+            }
+          } else if (this.type === 'child') {
+            if (typeof this.selectNode[0].children === 'undefined') {
+              this.$set(this.selectNode[0], 'children', [data])
+            } else {
+              let arr = [...this.selectNode[0].children, data]
+              arr = sortObj(arr, 'sort')
+              this.$set(this.selectNode[0], 'children', arr)
+              // this.$set(this.selectNode[0], 'children', [
+              //   ...this.selectNode[0].children,
+              //   data
+              // ])
+            }
+          }
+          // this.isEdit = false
+          // this.$refs.form.resetFields()
+          this.initFields()
+        } else {
+          this.$Message.error('请检查表单数据')
+        }
+      })
+    },
+    cancel () {
 
     }
   }
