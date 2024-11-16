@@ -51,5 +51,7 @@ export default {
   menu: '系统菜单配置',
   menu_management: '菜单管理',
   roles: '角色权限管理',
-  roles_management: '角色权限'
+  roles_management: '角色权限',
+  'Menu Options': '菜单选项',
+  'Resources': '资源选项'
 }
