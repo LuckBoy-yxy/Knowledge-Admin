@@ -26,52 +26,93 @@
           icon="ios-options"
           style="margin-bottom: 10px;"
         >
-          <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
-            <FormItem label="Name" prop="name">
-              <Input v-model="formValidate.name" placeholder="Enter your name"></Input>
+          <Form
+            ref="formValidate"
+            :model="formData"
+            :rules="formRules"
+            :label-width="80"
+          >
+            <FormItem label="菜单标题" prop="name">
+              <Input
+                v-model="formData.name"
+                placeholder="请输入菜单名称"
+              />
             </FormItem>
-            <FormItem label="E-mail" prop="mail">
-              <Input v-model="formValidate.mail" placeholder="Enter your e-mail"></Input>
+
+            <FormItem label="路径" prop="path">
+              <Input
+                v-model="formData.path"
+                placeholder="请输入菜单路径"
+              />
             </FormItem>
-            <FormItem label="City" prop="city">
-              <Select v-model="formValidate.city" placeholder="Select your city">
-                <Option value="beijing">New York</Option>
-                <Option value="shanghai">London</Option>
-                <Option value="shenzhen">Sydney</Option>
+
+            <FormItem label="组件" prop="component">
+              <Input
+                v-model="formData.component"
+                placeholder="请输入前端组件名称"
+              >
+                <span slot="prepend">()=>import('@/view</span>
+                <span slot="append">.vue')</span>
+              </Input>
+            </FormItem>
+
+            <FormItem label="排序">
+              <Input
+                v-model="formData.sort"
+                placeholder="组件默认排序"
+                style="width: 100px"
+              />
+            </FormItem>
+
+            <FormItem label="面包屑">
+              隐藏&nbsp;
+              <i-switch
+                v-model="formData.hideInBread"
+              />
+              &nbsp;显示
+            </FormItem>
+
+            <FormItem label="菜单类型">
+              <Select
+                v-model="formData.type"
+                placeholder="请选择菜单类型"
+                style="width: 200px"
+              >
+                <Option value="menu">目录</Option>
+                <Option value="resource">资源</Option>
               </Select>
             </FormItem>
-            <FormItem label="Date">
-              <Row>
-                <Col span="11">
-                  <FormItem prop="date">
-                    <DatePicker type="date" placeholder="Select date" v-model="formValidate.date"></DatePicker>
-                  </FormItem>
-                </Col>
-                <Col span="2" style="text-align: center">-</Col>
-                <Col span="11">
-                  <FormItem prop="time">
-                    <TimePicker type="time" placeholder="Select time" v-model="formValidate.time"></TimePicker>
-                  </FormItem>
-                </Col>
-              </Row>
+
+            <FormItem label="菜单显示">
+              隐藏&nbsp;
+              <i-switch
+                v-model="formData.hideInMenu"
+              />
+              &nbsp;显示
             </FormItem>
-            <FormItem label="Gender" prop="gender">
-              <RadioGroup v-model="formValidate.gender">
-                <Radio label="male">Male</Radio>
-                <Radio label="female">Female</Radio>
-              </RadioGroup>
+
+            <FormItem label="缓存">
+              不使用&nbsp;
+              <i-switch
+                v-model="formData.notCache"
+              />
+              &nbsp;使用
             </FormItem>
-            <FormItem label="Hobby" prop="interest">
-              <CheckboxGroup v-model="formValidate.interest">
-                <Checkbox label="Eat"></Checkbox>
-                <Checkbox label="Sleep"></Checkbox>
-                <Checkbox label="Run"></Checkbox>
-                <Checkbox label="Movie"></Checkbox>
-              </CheckboxGroup>
+
+            <FormItem label="图标">
+              <Input
+                v-model="formData.icon"
+                placeholder="请输入前端组件名称"
+              />
             </FormItem>
-            <FormItem label="Desc" prop="desc">
-              <Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="Enter something..."></Input>
+
+            <FormItem label="重定向">
+              <Input
+                v-model="formData.redirect"
+                placeholder="重定向组件"
+              />
             </FormItem>
+
             <FormItem>
               <Button type="primary" @click="handleSubmit('formValidate')">Submit</Button>
               <Button @click="handleReset('formValidate')" style="margin-left: 8px">Reset</Button>
@@ -129,43 +170,28 @@ export default {
           ]
         }
       ],
-      formValidate: {
+      formData: {
         name: '',
-        mail: '',
-        city: '',
-        gender: '',
-        interest: [],
-        date: '',
-        time: '',
-        desc: ''
+        path: '',
+        component: '',
+        hideInBread: false,
+        hideInMenu: false,
+        notCache: false,
+        icon: '',
+        sort: 0,
+        redirect: '',
+        type: 'menu',
+        operations: []
       },
-      ruleValidate: {
+      formRules: {
         name: [
-          { required: true, message: 'The name cannot be empty', trigger: 'blur' }
+          { required: true, message: '菜单标题不能为空', trigger: 'blur' }
         ],
-        mail: [
-          { required: true, message: 'Mailbox cannot be empty', trigger: 'blur' },
-          { type: 'email', message: 'Incorrect email format', trigger: 'blur' }
+        path: [
+          { required: true, message: '菜单路径不能为空', trigger: 'blur' }
         ],
-        city: [
-          { required: true, message: 'Please select the city', trigger: 'change' }
-        ],
-        gender: [
-          { required: true, message: 'Please select gender', trigger: 'change' }
-        ],
-        interest: [
-          { required: true, type: 'array', min: 1, message: 'Choose at least one hobby', trigger: 'change' },
-          { type: 'array', max: 2, message: 'Choose two hobbies at best', trigger: 'change' }
-        ],
-        date: [
-          { required: true, type: 'date', message: 'Please select the date', trigger: 'change' }
-        ],
-        time: [
-          { required: true, type: 'string', message: 'Please select time', trigger: 'change' }
-        ],
-        desc: [
-          { required: true, message: 'Please enter a personal introduction', trigger: 'blur' },
-          { type: 'string', min: 20, message: 'Introduce no less than 20 words', trigger: 'blur' }
+        component: [
+          { required: true, message: '前端组件不得为空', trigger: 'blur' }
         ]
       },
       columns4: [
