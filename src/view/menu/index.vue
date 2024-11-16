@@ -341,6 +341,7 @@ export default {
     editMenu () {
       if (this.selectNode.length > 0) {
         this.isEdit = true
+        this.formData = { ...this.selectNode[0] }
       } else {
         this.$Message.info('请选择菜单节点后, 再编辑')
       }
@@ -391,20 +392,23 @@ export default {
         type: 'menu',
         operations: []
       }
+      this.type = ''
     },
     submit () {
       this.$refs.form.validate(valid => {
         if (valid) {
           const data = {
-            title: this.formData.name,
+            // title: this.formData.name,
             ...this.formData,
             expand: true
           }
+          data.title = this.formData.name
+
           if (this.type === 'bro') {
             if (this.menuData.length === 0) {
               this.menuData.push(data)
-              // this.isEdit = false
-              // this.$refs.form.resetFields()
+              this.isEdit = false
+              this.$refs.form.resetFields()
             } else {
               const selectNode = this.selectNode[0]
               const getMenu = (parent, select) => {
@@ -436,6 +440,24 @@ export default {
               //   data
               // ])
             }
+          } else {
+            const updateNode = (tree, node) => {
+              for (let i = 0; i < tree.length; i++) {
+                const currentNode = tree[i]
+                if (currentNode.nodeKey === node.nodeKey) {
+                  // tree[i] = node
+                  tree.splice(i, 1, node)
+                  return tree
+                } else {
+                  if (currentNode.children && currentNode.children.length > 0) {
+                    updateNode(currentNode.children, node)
+                  }
+                }
+              }
+              return tree
+            }
+            this.menuData = updateNode(this.menuData, data)
+            this.$set(this.selectNode, 0, data)
           }
           // this.isEdit = false
           // this.$refs.form.resetFields()
@@ -446,7 +468,7 @@ export default {
       })
     },
     cancel () {
-
+      this.initFields()
     }
   }
 }
