@@ -14,10 +14,13 @@
             align="middle"
             justify="center"
           >
-            <ButtonGroup class="btn-group">
+            <ButtonGroup
+              class="btn-group"
+              :class="{ editing: isEdit }"
+            >
               <!-- @click="addMenu" -->
               <!-- icon="md-add" -->
-              <Button size="small">
+              <Button size="small" :disabled="isEdit">
                 <Dropdown @on-click="addMenu">
                   <a href="javascript:void(0)">
                     <Icon type="md-add"></Icon>
@@ -37,6 +40,7 @@
                 size="small"
                 type="primary"
                 icon="ios-create"
+                :disabled="isEdit"
                 @click="editMenu"
               >编辑</Button>
 
@@ -44,6 +48,7 @@
                 size="small"
                 type="error"
                 icon="md-trash"
+                :disabled="isEdit"
                 @click="deleteMenu"
               >删除</Button>
             </ButtonGroup>
@@ -529,6 +534,17 @@ export default {
   .ivu-icon {
     & + span {
       margin-left: 0;
+    }
+  }
+  &.editing {
+    a {
+      color: #dcdee2;
+    }
+    .ivu-btn-primary {
+      border-color: #dcdee2 !important;
+    }
+    button:first-child {
+      border-right: 0;
     }
   }
 }
