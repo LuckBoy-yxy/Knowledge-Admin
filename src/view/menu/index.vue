@@ -15,13 +15,33 @@
             justify="center"
           >
             <ButtonGroup class="btn-group">
-              <Button size="small" icon="md-add">新增</Button>
-              <Button size="small" type="primary" icon="ios-create">编辑</Button>
+              <!-- @click="addMenu" -->
+              <!-- icon="md-add" -->
+              <Button size="small">
+                <Dropdown @on-click="addMenu">
+                  <a href="javascript:void(0)">
+                    <Icon type="md-add"></Icon>
+                    <span class="dropdown">新增</span>
+                  </a>
+                  <DropdownMenu slot="list">
+                    <DropdownItem name="bro">兄弟节点</DropdownItem>
+                    <DropdownItem name="child">子节点</DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </Button>
+
+              <Button
+                size="small"
+                type="primary"
+                icon="ios-create"
+                @click="editMenu"
+              >编辑</Button>
+
               <Button size="small" type="error" icon="md-trash">删除</Button>
             </ButtonGroup>
           </Row>
 
-          <Tree :data="data1"></Tree>
+          <Tree :data="data1" @on-select-change="handleTreeSelect"></Tree>
         </Card>
       </Col>
 
@@ -204,6 +224,7 @@ export default {
   data () {
     return {
       isEdit: false,
+      selectNode: [],
       page: 1,
       pageSize: 10,
       pageArr: [10, 20, 30, 50, 100],
@@ -334,6 +355,25 @@ export default {
     }
   },
   methods: {
+    addMenu (type) {
+      console.log(type)
+      if (this.selectNode.length > 0) {
+        this.isEdit = true
+      } else {
+        this.$Message.info('请选择菜单节点后, 再添加')
+      }
+    },
+    editMenu () {
+      if (this.selectNode.length > 0) {
+        this.isEdit = true
+      } else {
+        this.$Message.info('请选择菜单节点后, 再编辑')
+      }
+    },
+    handleTreeSelect (item) {
+      this.selectNode = item
+      console.log(item)
+    },
     onPageChange () {
 
     },
@@ -373,6 +413,9 @@ export default {
       & + span {
         display: none;
       }
+    }
+    .dropdown {
+      display: none;
     }
   }
 }
