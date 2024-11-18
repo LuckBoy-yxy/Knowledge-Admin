@@ -2,7 +2,7 @@
   <div>
     <Tables
       ref="tables"
-      v-model="tableData"
+      v-model="localData"
       :columns="columns"
       editable
       searchable
@@ -14,6 +14,7 @@
     >
       <template v-slot:table-header>
         <Button
+          v-if="isEdit"
           class="search-btn"
           type="primary"
           @click="handleAdd"
@@ -29,12 +30,12 @@
       align="middle"
       style="margin-top: 10px;"
     >
-      <Col class="ctrls">
+      <Col class="ctrls" v-if="isEdit">
         <Button @click="handleDeleteBath">批量删除</Button>
         <Button style="margin: 0 10px;" @click="handleSetBath">批量设置</Button>
       </Col>
 
-      <Col>
+      <!-- <Col>
         <Page
           :total="total"
           show-elevator
@@ -46,18 +47,27 @@
           @on-change="onPageChange"
           @on-page-size-change="onPageSizeChange"
         />
-      </Col>
+      </Col> -->
     </Row>
+
+    <AddModal
+      ref="addModel"
+      :isShow="showAdd"
+      @AddEvent="submitItemAdd"
+      @AddCancelEvent="handleItemCancel"
+    />
   </div>
 </template>
 
 <script>
 import Tables from '_c/tables'
+import AddModal from './operations/add'
 
 export default {
   name: 'OperationCom',
   components: {
-    Tables
+    Tables,
+    AddModal
   },
   props: {
     tableData: {
@@ -67,23 +77,38 @@ export default {
     columns: {
       type: Array,
       default: () => []
+    },
+    isEdit: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
     return {
-      page: 1,
-      pageSize: 10,
-      pageArr: [10, 20, 30, 50, 100],
-      total: 0
+      // page: 1,
+      // pageSize: 10,
+      // pageArr: [10, 20, 30, 50, 100],
+      // total: 0,
+      showAdd: false
+    }
+  },
+  computed: {
+    localData: {
+      get () {
+        return this.tableData
+      },
+      set (value) {
+        console.log(value)
+      }
     }
   },
   methods: {
-    onPageChange (page) {
-      this.page = page
-    },
-    onPageSizeChange (pageSize) {
-      this.pageSize = pageSize
-    },
+    // onPageChange (page) {
+    //   this.page = page
+    // },
+    // onPageSizeChange (pageSize) {
+    //   this.pageSize = pageSize
+    // },
     handleRowEdit () {
 
     },
@@ -100,7 +125,13 @@ export default {
 
     },
     handleAdd () {
-
+      this.showAdd = true
+    },
+    submitItemAdd (data) {
+      this.localData.push(data)
+    },
+    handleItemCancel (value) {
+      this.showAdd = value
     },
     handleSetBath () {
 

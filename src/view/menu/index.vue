@@ -48,6 +48,7 @@
           icon="ios-send"
         >
           <OperationsTable
+            :isEdit="isEdit"
             :tableData="tableData"
             :columns="columns"
           />
@@ -91,20 +92,27 @@ export default {
           key: 'name',
           search: {
             type: 'input'
-          }
+          },
+          align: 'center'
         },
         {
           title: '资源路径',
           key: 'path',
           search: {
             type: 'input'
-          }
+          },
+          align: 'center'
         },
         {
           title: '请求类型',
-          key: 'methods',
+          // key: 'methods',
+          key: 'method',
           search: {
             type: 'input'
+          },
+          align: 'center',
+          render: (h, params) => {
+            return h('div', params.row.method.toUpperCase())
           }
         },
         {
@@ -126,7 +134,8 @@ export default {
                 value: 'btn'
               }
             ]
-          }
+          },
+          align: 'center'
         },
         {
           title: '资源描述',
