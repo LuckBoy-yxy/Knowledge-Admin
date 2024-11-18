@@ -51,6 +51,7 @@
             :isEdit="isEdit"
             :tableData="tableData"
             :columns="columns"
+            @on-change="handelTableAdd"
           />
         </Card>
       </Col>
@@ -156,8 +157,12 @@ export default {
       ]
     }
   },
+  mounted () {
+    window.vue = this
+  },
   methods: {
     addMenu (type) {
+      this.cancel()
       this.isEdit = true
       this.type = type
     },
@@ -169,9 +174,21 @@ export default {
       this.menuData = deleteNode(this.menuData, item)
     },
     handleTreeSelect (item) {
-      this.selectNode = item
+      if (!this.isEdit) {
+        this.selectNode = item
+        this.formData = item[0]
+        this.tableData = item[0].operations.length ? item[0].operations : []
+      } else {
+        this.$Message.info('当前为编辑状态, 请取消编辑再查看')
+      }
+    },
+    handelTableAdd (table) {
+      this.tableData = table
     },
     submit (data) {
+      if (this.tableData.length > 0) {
+        data.operations = this.tableData
+      }
       if (this.type === 'bro') {
         if (this.menuData.length === 0) {
           this.menuData.push(data)
@@ -195,6 +212,20 @@ export default {
     cancel () {
       this.type = ''
       this.isEdit = false
+      this.formData = {
+        name: '',
+        path: '',
+        component: '',
+        hideInBread: false,
+        hideInMenu: false,
+        notCache: false,
+        icon: '',
+        sort: 0,
+        redirect: '',
+        type: 'menu',
+        operations: []
+      }
+      this.tableData = []
     }
   }
 }

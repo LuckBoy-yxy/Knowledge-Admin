@@ -158,19 +158,19 @@ export default {
     },
     cancel () {
       this.$refs.form.resetFields()
-      this.formData = {
-        name: '',
-        path: '',
-        component: '',
-        hideInBread: false,
-        hideInMenu: false,
-        notCache: false,
-        icon: '',
-        sort: 0,
-        redirect: '',
-        type: 'menu',
-        operations: []
-      }
+      // this.formData = {
+      //   name: '',
+      //   path: '',
+      //   component: '',
+      //   hideInBread: false,
+      //   hideInMenu: false,
+      //   notCache: false,
+      //   icon: '',
+      //   sort: 0,
+      //   redirect: '',
+      //   type: 'menu',
+      //   operations: []
+      // }
       this.$emit('cancel')
     }
   },

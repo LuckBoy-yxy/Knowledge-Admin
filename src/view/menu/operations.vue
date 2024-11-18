@@ -129,6 +129,8 @@ export default {
     },
     submitItemAdd (data) {
       this.localData.push(data)
+      // this.$emit('on-change', data)
+      this.$emit('on-change', this.localData)
     },
     handleItemCancel (value) {
       this.showAdd = value
