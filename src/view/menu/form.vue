@@ -142,10 +142,11 @@ export default {
       this.$refs.form.validate(valid => {
         if (valid) {
           const data = {
-            title: this.formData.name,
+            // title: this.formData.name,
             ...this.formData,
             expand: true
           }
+          data.title = this.formData.name
           this.$emit('submit', data)
           setTimeout(() => {
             this.cancel()
