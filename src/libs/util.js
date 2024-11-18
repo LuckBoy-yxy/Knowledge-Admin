@@ -412,3 +412,49 @@ export const setTitle = (routeItem, vm) => {
 export const sortObj = (arr, property) => {
   return arr.sort((a, b) => a[property] - b[property])
 }
+
+export const updateNode = (tree, node) => {
+  for (let i = 0; i < tree.length; i++) {
+    const currentNode = tree[i]
+    if (currentNode.nodeKey === node.nodeKey) {
+      tree.splice(i, 1, node)
+      return tree
+    } else {
+      if (currentNode.children && currentNode.children.length > 0) {
+        updateNode(currentNode.children, node)
+      }
+    }
+  }
+  return tree
+}
+
+export const insertNode = (parent, select, data) => {
+  for (let i = 0; i < parent.length; i++) {
+    const item = parent[i]
+    if (item.nodeKey === select.nodeKey) {
+      parent.push(data)
+      parent = sortObj(parent, 'sort')
+      return parent
+    } else {
+      if (item.children && item.children.length > 0) {
+        insertNode(item.children, select, data)
+      }
+    }
+  }
+  return parent
+}
+
+export const deleteNode = (tree, node) => {
+  for (let i = 0; i < tree.length; i++) {
+    const currentNode = tree[i]
+    if (currentNode.nodeKey === node.nodeKey) {
+      tree.splice(i, 1)
+      return tree
+    } else {
+      if (currentNode.children && currentNode.children.length > 0) {
+        deleteNode(currentNode.children, node)
+      }
+    }
+  }
+  return tree
+}
