@@ -56,7 +56,7 @@ import Tables from '_c/tables'
 
 export default {
   name: 'OperationCom',
-  component: {
+  components: {
     Tables
   },
   props: {
