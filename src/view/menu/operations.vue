@@ -154,7 +154,26 @@ export default {
       }
     },
     handleDeleteBath () {
-
+      if (this.selections.length >= 2) {
+        this.$Modal.confirm({
+          title: '确定执行批量删除操作吗?',
+          onOk: () => {
+            const arr = this.selections.map(item => item.name)
+            // this.localData.forEach((item, index) => {
+            //   if (arr.includes(item.name)) {
+            //     this.localData.splice(index, 1)
+            //   }
+            // })
+            const tmp = this.localData.filter(item => !arr.includes(item.name))
+            this.$emit('on-change', tmp)
+          },
+          onCancel: () => {
+            this.$Message.info('取消操作')
+          }
+        })
+      } else {
+        this.$Message.info('批量删除的资源选项个数最少为两个')
+      }
     },
     handleSelect (seletcion) {
       this.selections = seletcion

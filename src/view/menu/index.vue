@@ -79,10 +79,7 @@ export default {
     return {
       isEdit: false,
       selectNode: [],
-      tableData: [
-        // { name: '11', path: '11', method: 'api', type: 'get' },
-        // { name: '22', path: '22', method: 'btn', type: 'post' }
-      ],
+      tableData: [],
       seletcion: [],
       type: '',
       menuData: [],
