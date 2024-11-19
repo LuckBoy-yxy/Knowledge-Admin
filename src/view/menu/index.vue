@@ -174,10 +174,12 @@ export default {
       this.menuData = deleteNode(this.menuData, item)
     },
     handleTreeSelect (item) {
+      // console.log(item, 1111)
+      if (item.length === 0) return
       if (!this.isEdit) {
         this.selectNode = item
         this.formData = item[0]
-        this.tableData = item[0].operations.length ? item[0].operations : []
+        this.tableData = item[0].operations.length ? [...item[0].operations] : []
       } else {
         this.$Message.info('当前为编辑状态, 请取消编辑再查看')
       }

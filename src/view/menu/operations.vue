@@ -52,7 +52,9 @@
 
     <AddModal
       ref="addModel"
-      :isShow="showAdd"
+      :isShow="showModal"
+      :isEdit="showEdit"
+      :item="selection"
       @AddEvent="submitItemAdd"
       @AddCancelEvent="handleItemCancel"
     />
@@ -89,7 +91,10 @@ export default {
       // pageSize: 10,
       // pageArr: [10, 20, 30, 50, 100],
       // total: 0,
-      showAdd: false
+      showModal: false,
+      showEdit: false,
+      selection: {},
+      currentIndex: 0
     }
   },
   computed: {
@@ -109,11 +114,33 @@ export default {
     // onPageSizeChange (pageSize) {
     //   this.pageSize = pageSize
     // },
-    handleRowEdit () {
-
+    handleRowEdit (item, index) {
+      if (this.isEdit) {
+        this.selection = item
+        this.currentIndex = index
+        this.showEdit = true
+        this.showModal = true
+      } else {
+        this.$Message.info('请先选择菜单节点, 再进行资源选项的编辑')
+      }
     },
     handleRowRemove () {
-
+      if (this.isEdit) {
+        this.$Modal.confirm({
+          title: `确定删除吗?`,
+          content: `删除 ${row.name} 资源选项吗?`,
+          onOk: () => {
+            this.tableData.splice(index, 1)
+            this.$Message.success('删除成功')
+            this.localData.splice(this.currentIndex, 1, data)
+          },
+          onCancel: () => {
+            this.$Message.info('取消操作')
+          }
+        })
+      } else {
+        this.$Message.info('请先选择菜单节点, 再进行资源选项的删除')
+      }
     },
     handleDeleteBath () {
 
@@ -125,15 +152,19 @@ export default {
 
     },
     handleAdd () {
-      this.showAdd = true
+      this.showModal = true
     },
     submitItemAdd (data) {
-      this.localData.push(data)
-      // this.$emit('on-change', data)
+      if (this.showEdit) {
+        this.localData.splice(this.currentIndex, 1, data)
+        this.showEdit = false
+      } else {
+        this.localData.push(data)
+      }
       this.$emit('on-change', this.localData)
     },
     handleItemCancel (value) {
-      this.showAdd = value
+      this.showModal = value
     },
     handleSetBath () {
 

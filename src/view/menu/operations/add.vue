@@ -2,7 +2,7 @@
   <div>
     <Modal
       v-model="showStatus"
-      title="添加资源信息"
+      :title="`${isEdit ? '编辑' : '添加'}资源选项`"
       @on-ok="ok"
       @on-cancel="cancel"
       :loading="loading"
@@ -62,6 +62,14 @@ export default {
     isShow: {
       type: Boolean,
       default: false
+    },
+    isEdit: {
+      type: Boolean,
+      default: false
+    },
+    item: {
+      type: Object,
+      default: () => {}
     }
   },
   data () {
@@ -120,6 +128,9 @@ export default {
   watch: {
     isShow (newVal, oldVal) {
       this.showStatus = newVal
+    },
+    item (newVal) {
+      this.formData = { ...newVal }
     }
   }
 }
