@@ -48,10 +48,12 @@
           icon="ios-send"
         >
           <OperationsTable
+            ref="table"
             :isEdit="isEdit"
             :tableData="tableData"
             :columns="columns"
             @on-change="handelTableAdd"
+            @batchSetEvent="handelBatchSet"
           />
         </Card>
       </Col>
@@ -77,7 +79,10 @@ export default {
     return {
       isEdit: false,
       selectNode: [],
-      tableData: [],
+      tableData: [
+        // { name: '11', path: '11', method: 'api', type: 'get' },
+        // { name: '22', path: '22', method: 'btn', type: 'post' }
+      ],
       seletcion: [],
       type: '',
       menuData: [],
@@ -185,6 +190,10 @@ export default {
       }
     },
     handelTableAdd (table) {
+      this.tableData = table
+    },
+    handelBatchSet (table) {
+      this.$refs.table.cancel()
       this.tableData = table
     },
     submit (data) {

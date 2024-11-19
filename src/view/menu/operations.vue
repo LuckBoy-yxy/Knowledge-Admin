@@ -58,18 +58,27 @@
       @AddEvent="submitItemAdd"
       @AddCancelEvent="handleItemCancel"
     />
+
+    <BatchSet
+      ref="BatchSet"
+      :isShow="showBatchSet"
+      @batchSetEvent="handleBatchSet"
+      @cancelEvent="handleBatchSetCancel"
+    />
   </div>
 </template>
 
 <script>
 import Tables from '_c/tables'
 import AddModal from './operations/add'
+import BatchSet from './operations/set.vue'
 
 export default {
   name: 'OperationCom',
   components: {
     Tables,
-    AddModal
+    AddModal,
+    BatchSet
   },
   props: {
     tableData: {
@@ -94,7 +103,9 @@ export default {
       showModal: false,
       showEdit: false,
       selection: {},
-      currentIndex: 0
+      currentIndex: 0,
+      showBatchSet: false,
+      selections: []
     }
   },
   computed: {
@@ -145,8 +156,8 @@ export default {
     handleDeleteBath () {
 
     },
-    handleSelect () {
-
+    handleSelect (seletcion) {
+      this.selections = seletcion
     },
     handleSearch () {
 
@@ -167,7 +178,38 @@ export default {
       this.showModal = value
     },
     handleSetBath () {
-
+      if (this.selections.length >= 2) {
+        this.showBatchSet = true
+      } else {
+        this.$Message.info('批量设置的资源选项个数最少为两个')
+      }
+    },
+    handleBatchSet (data) {
+      this.$Modal.confirm({
+        title: '确定要执行批量设置吗?',
+        onOk: () => {
+          const arr = this.selections.map(item => item.name)
+          this.localData.forEach(item => {
+            if (arr.includes(item.name)) {
+              for (const key of Object.keys(data)) {
+                item[key] = data[key]
+              }
+            }
+          })
+          this.$Message.success('批量设置成功')
+          this.$emit('batchSetEvent', this.localData)
+        },
+        onCancel: () => {
+          this.$Message.success('取消操作')
+          this.cancel()
+        }
+      })
+    },
+    handleBatchSetCancel (value) {
+      this.showBatchSet = value
+    },
+    cancel () {
+      this.$refs.BatchSet.cancel()
     }
   }
 }
