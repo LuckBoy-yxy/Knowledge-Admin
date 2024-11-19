@@ -176,8 +176,23 @@ export default {
       this.menuData = deleteNode(this.menuData, item)
     },
     handleTreeSelect (item) {
-      // console.log(item, 1111)
-      if (item.length === 0) return
+      if (item.length === 0) {
+        this.formData = {
+          name: '',
+          path: '',
+          component: '',
+          hideInBread: false,
+          hideInMenu: false,
+          notCache: false,
+          icon: '',
+          sort: 0,
+          redirect: '',
+          type: 'menu',
+          operations: []
+        }
+        this.table = []
+        return
+      }
       if (!this.isEdit) {
         this.selectNode = item
         this.formData = item[0]
