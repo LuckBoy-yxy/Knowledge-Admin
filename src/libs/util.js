@@ -458,3 +458,37 @@ export const deleteNode = (tree, node) => {
   }
   return tree
 }
+
+export const deleteKey = (node, property) => {
+  if (node.children && node.children.length > 0) {
+    node.forEach(item => {
+      delete item[property]
+      if (item.children && item.children.length > 0) {
+        deleteKey(item, property)
+      }
+    })
+  }
+  return node
+}
+
+export const getNode = (arr, node) => {
+  for (let i = 0; i < arr.length; i++) {
+    const currentNode = arr[i]
+    if (currentNode.nodeKey === node.nodeKey) {
+      if (!currentNode.parent) {
+        deleteKey(currentNode, 'parent')
+        return currentNode
+      } else {
+        return true
+      }
+    } else {
+      if (currentNode.child && currentNode.child.length > 0) {
+        currentNode.forEach(item => (item.parent = currentNode))
+        if (getNode(currentNode.children, node)) {
+          deleteKey(currentNode, 'parent')
+          return currentNode
+        }
+      }
+    }
+  }
+}

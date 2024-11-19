@@ -66,7 +66,9 @@ import Tree from './tree.vue'
 import Form from './form.vue'
 import OperationsTable from './operations.vue'
 
-import { sortObj, updateNode, insertNode, deleteNode } from '../../libs/util'
+import { getMenu, addMenu, updateMenu } from '@/api/admin'
+
+import { sortObj, updateNode, insertNode, deleteNode, getNode } from '../../libs/util'
 
 export default {
   name: 'MenuManagement',
@@ -161,8 +163,16 @@ export default {
   },
   mounted () {
     window.vue = this
+    this._getMenu()
   },
   methods: {
+    _getMenu () {
+      getMenu().then(res => {
+        if (res.code === 200) {
+          this.menuData = res.data
+        }
+      })
+    },
     addMenu (type) {
       this.cancel()
       this.isEdit = true
@@ -178,7 +188,8 @@ export default {
     handleTreeSelect (item) {
       if (item.length === 0) {
         this.formData = {
-          name: '',
+          // name: '',
+          title: '',
           path: '',
           component: '',
           hideInBread: false,
@@ -209,6 +220,7 @@ export default {
       this.tableData = table
     },
     submit (data) {
+      let parent = getNode(this.menuData, this.selectNode[0])
       if (this.tableData.length > 0) {
         data.operations = this.tableData
       } else {
@@ -217,9 +229,28 @@ export default {
       if (this.type === 'bro') {
         if (this.menuData.length === 0) {
           this.menuData.push(data)
+          addMenu(data).then(res => {
+            if (res.code === 200) {
+              this.$Message.success('菜单添加成功')
+            }
+          })
         } else {
           const selectNode = this.selectNode[0]
           this.menuData = insertNode(this.menuData, selectNode, data)
+          if (parent.nodeKey === selectNode.nodeKey) {
+            addMenu(data).then(res => {
+              if (res.code === 200) {
+                this.$Message.success('菜单添加成功')
+              }
+            })
+          } else {
+            parent = getNode(this.menuData, selectNode)
+            updateMenu(parent).then(res => {
+              if (res.code === 200) {
+                this.$Message.success('菜单添加成功')
+              }
+            })
+          }
         }
       } else if (this.type === 'child') {
         if (typeof this.selectNode[0].children === 'undefined') {

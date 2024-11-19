@@ -30,3 +30,19 @@ export const checkUserName = username => {
 export const addUser = data => {
   return request.post('/admin/add-user', data)
 }
+
+export const addMenu = data => {
+  return request.post('/admin/add-menu', data)
+}
+
+export const updateMenu = data => {
+  return request.post('/admin/update-menu', data)
+}
+
+export const deleteMenu = data => {
+  return request.post('/admin/delete-menu', data)
+}
+
+export const getMenu = () => {
+  return request.get('/admin/get-menu')
+}

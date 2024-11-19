@@ -7,9 +7,9 @@
       :rules="formRules"
       :label-width="80"
     >
-      <FormItem label="菜单标题" prop="name">
+      <FormItem label="菜单标题" prop="title">
         <Input
-          v-model="formData.name"
+          v-model="formData.title"
           placeholder="请输入菜单名称"
         />
       </FormItem>
@@ -112,7 +112,7 @@ export default {
   data () {
     return {
       formData: {
-        name: '',
+        title: '',
         path: '',
         component: '',
         hideInBread: false,
@@ -125,7 +125,7 @@ export default {
         operations: []
       },
       formRules: {
-        name: [
+        title: [
           { required: true, message: '菜单标题不能为空', trigger: 'blur' }
         ],
         path: [
@@ -146,7 +146,7 @@ export default {
             ...this.formData,
             expand: true
           }
-          data.title = this.formData.name
+          // data.title = this.formData.name
           this.$emit('submit', data)
           setTimeout(() => {
             this.cancel()
