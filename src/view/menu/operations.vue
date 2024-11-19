@@ -135,15 +135,14 @@ export default {
         this.$Message.info('请先选择菜单节点, 再进行资源选项的编辑')
       }
     },
-    handleRowRemove () {
+    handleRowRemove (row, index) {
       if (this.isEdit) {
         this.$Modal.confirm({
           title: `确定删除吗?`,
           content: `删除 ${row.name} 资源选项吗?`,
           onOk: () => {
-            this.tableData.splice(index, 1)
-            this.$Message.success('删除成功')
-            this.localData.splice(this.currentIndex, 1, data)
+            this.localData.splice(index, 1)
+            this.$emit('on-change', this.localData)
           },
           onCancel: () => {
             this.$Message.info('取消操作')

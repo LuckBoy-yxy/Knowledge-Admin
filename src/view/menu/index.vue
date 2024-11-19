@@ -196,6 +196,8 @@ export default {
     submit (data) {
       if (this.tableData.length > 0) {
         data.operations = this.tableData
+      } else {
+        data.operations = []
       }
       if (this.type === 'bro') {
         if (this.menuData.length === 0) {
