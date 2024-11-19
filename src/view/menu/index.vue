@@ -260,9 +260,21 @@ export default {
           arr = sortObj(arr, 'sort')
           this.$set(this.selectNode[0], 'children', arr)
         }
+        parent = getNode(this.menuData, this.selectNode[0])
+        updateMenu(parent).then(res => {
+          if (res.code === 200) {
+            this.$Message.success('子菜单添加成功')
+          }
+        })
       } else {
         this.menuData = updateNode(this.menuData, data)
         this.$set(this.selectNode, 0, data)
+        parent = getNode(this.menuData, this.selectNode[0])
+        updateMenu(parent).then(res => {
+          if (res.code === 200) {
+            this.$Message.success('子菜单编辑成功')
+          }
+        })
       }
     },
     cancel () {

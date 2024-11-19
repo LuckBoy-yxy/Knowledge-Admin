@@ -461,10 +461,10 @@ export const deleteNode = (tree, node) => {
 
 export const deleteKey = (node, property) => {
   if (node.children && node.children.length > 0) {
-    node.forEach(item => {
+    node.children.forEach(item => {
       delete item[property]
       if (item.children && item.children.length > 0) {
-        deleteKey(item, property)
+        deleteKey(item.children, property)
       }
     })
   }
@@ -482,8 +482,8 @@ export const getNode = (arr, node) => {
         return true
       }
     } else {
-      if (currentNode.child && currentNode.child.length > 0) {
-        currentNode.forEach(item => (item.parent = currentNode))
+      if (currentNode.children && currentNode.children.length > 0) {
+        currentNode.children.forEach(item => (item.parent = currentNode))
         if (getNode(currentNode.children, node)) {
           deleteKey(currentNode, 'parent')
           return currentNode
