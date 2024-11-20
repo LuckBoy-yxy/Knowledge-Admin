@@ -66,7 +66,7 @@ import Tree from './tree.vue'
 import Form from './form.vue'
 import OperationsTable from './operations.vue'
 
-import { getMenu, addMenu, updateMenu } from '@/api/admin'
+import { getMenu, addMenu, updateMenu, deleteMenu } from '@/api/admin'
 
 import { sortObj, updateNode, insertNode, deleteNode, getNode } from '../../libs/util'
 
@@ -183,6 +183,21 @@ export default {
       this.formData = item
     },
     deleteMenu (item) {
+      const parent = getNode(this.menuData, item)
+      console.log(parent)
+      if (parent.nodeKey !== item.nodeKey) {
+        updateMenu(parent).then(res => {
+          if (res.code === 200) {
+            this.$Message.success('子菜单删除成功')
+          }
+        })
+      } else {
+        deleteMenu({ _id: parent._id }).then((res) => {
+          if (res.code === 200) {
+            this.$Message.success('菜单删除成功！')
+          }
+        })
+      }
       this.menuData = deleteNode(this.menuData, item)
     },
     handleTreeSelect (item) {
