@@ -184,7 +184,7 @@ export default {
     },
     deleteMenu (item) {
       const parent = getNode(this.menuData, item)
-      console.log(parent)
+      this.menuData = deleteNode(this.menuData, item)
       if (parent.nodeKey !== item.nodeKey) {
         updateMenu(parent).then(res => {
           if (res.code === 200) {
@@ -198,7 +198,6 @@ export default {
           }
         })
       }
-      this.menuData = deleteNode(this.menuData, item)
     },
     handleTreeSelect (item) {
       if (item.length === 0) {
