@@ -52,5 +52,7 @@ export default {
   menu_management: 'Menu Management',
   roles_management: 'Roles Management',
   'Menu Options': 'Menu Options',
-  'Resources': 'Resources'
+  'Resources': 'Resources',
+  'Menu Permission': 'Menu Permission',
+  'Role List': 'Role List'
 }

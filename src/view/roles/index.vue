@@ -5,9 +5,13 @@
         <Card dis-hover shadow>
           <p slot="title">
             <Icon type="md-contacts"></Icon>
-            角色列表
+            {{ $t('Role List') }}
           </p>
-          <a href="#" slot="extra">
+          <a
+            v-if="!isEdit"
+            slot="extra"
+            @click.prevent="addRole"
+          >
             <Icon type="md-add"></Icon>新增
           </a>
           <ul class="my-card">
@@ -22,8 +26,17 @@
                 class="flex1 round"
               >{{ item.title }}</div>
               <span>
-                <Icon type="md-build" size="18" color="#2d8cf0" />
-                <Icon type="md-trash" size="20" color="#ed4014" />
+                <Icon
+                  type="md-build"
+                  size="18"
+                  color="#2d8cf0"
+                  @click.stop="editRole(item, index)"
+                />
+                <Icon
+                  type="md-trash"
+                  ize="20"
+                  color="#ed4014"
+                />
               </span>
             </li>
           </ul>
@@ -31,7 +44,31 @@
       </Col>
 
       <Col span="6">
-        <Card dis-hover shadow>
+        <Card
+          dis-hover
+          shadow
+          :title="$t('Menu Permission')"
+          icon="md-apps"
+        >
+          <div slot="extra">
+            <ButtonGroup
+              class="btn-group"
+              v-if="isEdit"
+            >
+              <Button
+                size="small"
+                type="primary"
+                icon="ios-create"
+                @click="submit"
+              >确定</Button>
+
+              <Button
+                size="small"
+                icon="md-trash"
+                @click="cancel"
+              >取消</Button>
+            </ButtonGroup>
+          </div>
           <Tree :data="menuData" show-checkbox></Tree>
         </Card>
       </Col>
@@ -49,16 +86,50 @@
             :tableData="tableData"
             :columns="columns"
             @on-change="handelTableChange"
-            @batchSetEvent="handelBatchSet"
           />
         </Card>
       </Col>
     </Row>
+
+    <Modal
+      v-model="showAdd"
+      title="添加角色"
+      @on-ok="ok"
+      @on-cancel="modalCancel"
+    >
+    <Form
+      ref="form"
+      :model="formData"
+      :label-width="80"
+      :rules="formRules"
+    >
+      <FormItem label="角色名称" prop="name">
+        <Input
+          v-model="formData.name"
+          placeholder="请输入角色名称"
+        />
+      </FormItem>
+
+      <FormItem label="角色编码" prop="role">
+        <Input
+          v-model="formData.role"
+          placeholder="请输入角色编码"
+        />
+      </FormItem>
+
+      <FormItem label="角色描述">
+        <Input
+          v-model="formData.desc"
+          placeholder="请输入角色描述"
+        />
+      </FormItem>
+    </Form>
+    </Modal>
   </div>
 </template>
 
 <script>
-import OperationsTable from '@/view/menu/operations.vue'
+import OperationsTable from './operations.vue'
 
 export default {
   name: 'MenuManagement',
@@ -68,6 +139,7 @@ export default {
   data () {
     return {
       isEdit: false,
+      showAdd: false,
       selectNode: [],
       roleIndex: '',
       menuData: [
@@ -109,6 +181,19 @@ export default {
         { title: 'parent4' },
         { title: 'parent5' }
       ],
+      formData: {
+        name: '',
+        role: '',
+        desc: ''
+      },
+      formRules: {
+        name: [
+          { required: true, message: '角色名称不能为空', trigger: 'blur' }
+        ],
+        role: [
+          { required: true, message: '角色编码不能为空', trigger: 'blur' }
+        ]
+      },
       tableData: [],
       columns: [
         {
@@ -183,14 +268,38 @@ export default {
         this.roleIndex = ''
       }
     },
-    addMenu () {
-
+    addRole () {
+      this.showAdd = true
     },
-    editMenu () {
-
+    editRole (role, index) {
+      this.isEdit = true
+      this.roleIndex = index
+      console.log(role, index)
     },
-    deleteMenu () {
+    submit () {
+      this.isEdit = false
+    },
+    cancel () {
+      this.isEdit = false
+    },
+    // addMenu () {
 
+    // },
+    // editMenu () {
+
+    // },
+    // deleteMenu () {
+
+    // },
+    ok () {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          console.log('1111')
+        }
+      })
+    },
+    modalCancel () {
+      this.showAdd = false
     },
     handleTreeSelect (item) {
       if (item.length === 0) {
@@ -206,9 +315,6 @@ export default {
     },
     handelTableChange (table) {
       this.tableData = table
-    },
-    handelBatchSet () {
-
     }
   }
 }

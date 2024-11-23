@@ -53,5 +53,7 @@ export default {
   roles: '角色权限管理',
   roles_management: '角色权限',
   'Menu Options': '菜单选项',
-  'Resources': '资源选项'
+  'Resources': '资源选项',
+  'Menu Permission': '菜单权限',
+  'Role List': '角色列表'
 }
