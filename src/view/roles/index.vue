@@ -24,18 +24,25 @@
             >
               <div
                 class="flex1 round"
-              >{{ item.title }}</div>
+              >{{ item.name }}</div>
               <span>
                 <Icon
+                  type="md-create"
+                  size="16"
+                  color="#17233d"
+                  @click.stop="editLabel(item, index)"
+                />
+                <Icon
                   type="md-build"
-                  size="18"
+                  size="16"
                   color="#2d8cf0"
                   @click.stop="editRole(item, index)"
                 />
                 <Icon
                   type="md-trash"
-                  ize="20"
+                  ize="16"
                   color="#ed4014"
+                  @click.stop="deleteRole(item, index)"
                 />
               </span>
             </li>
@@ -97,10 +104,11 @@
     </Row>
 
     <Modal
-      v-model="showAdd"
-      title="添加角色"
+      :loading="loading"
+      v-model="showModal"
+      :title="type ? '编辑角色' : '添加角色'"
       @on-ok="modalSubmit"
-      @on-cancel="modalCancel"
+      @on-cancel="initForm"
     >
       <Form
         ref="form"
@@ -145,17 +153,16 @@ export default {
   },
   data () {
     return {
+      type: false,
+      loading: true,
       isEdit: false,
-      showAdd: false,
+      showModal: false,
       selectNode: [],
+      editIndex: '',
       roleIndex: '',
       menuData: [],
       roles: [
-        { title: 'parent1' },
-        { title: 'parent2' },
-        { title: 'parent3' },
-        { title: 'parent4' },
-        { title: 'parent5' }
+        { name: '超级管理员', role: 'super_admin' }
       ],
       formData: {
         name: '',
@@ -255,12 +262,31 @@ export default {
       }
     },
     addRole () {
-      this.showAdd = true
+      this.showModal = true
     },
     editRole (role, index) {
       this.isEdit = true
       this.roleIndex = index
-      console.log(role, index)
+    },
+    editLabel (role, index) {
+      this.type = true
+      this.editIndex = index
+      this.showModal = true
+      this.formData = { ...role }
+    },
+    deleteRole (role, index) {
+      this.$Modal.confirm({
+        title: '确定执行删除吗?',
+        content: `删除 ${role.name} 角色吗`,
+        onOk: () => {
+          // this.roles = this.roles.filter(item => (item.name !== role.name))
+          this.roles.splice(index, 1)
+          this.$Message.success('删除角色成功')
+        },
+        onCancel: () => {
+          this.$Message.info('取消操作')
+        }
+      })
     },
     submit () {
       this.isEdit = false
@@ -271,18 +297,40 @@ export default {
     modalSubmit () {
       this.$refs.form.validate(valid => {
         if (valid) {
-          console.log('1111')
+          this.loading = false
+          if (this.type) {
+            this.roles.splice(this.editIndex, 1, { ...this.formData })
+            this.$Message.success('编辑角色成功')
+          } else {
+            this.roles.push({ ...this.formData })
+            this.$Message.success('新增角色成功')
+          }
+          setTimeout(() => {
+            this.initForm()
+          }, 0)
+        } else {
+          this.loading = false
+          this.$nextTick(() => (this.loading = true))
+          this.$Message.error('请检查表单数据')
         }
       })
     },
-    modalCancel () {
-      this.showAdd = false
+    initForm () {
+      this.showModal = false
+      this.type = false
+      this.formData = {
+        name: '',
+        role: '',
+        desc: ''
+      }
+      this.$refs.form.resetFields()
     },
     handleTreeSelect (item) {
       if (item.length === 0) {
         this.table = []
         return
       }
+
       this.selectNode = item
       this.tableData = item[0].operations.length ? [...item[0].operations] : []
     },
@@ -302,7 +350,7 @@ export default {
   span {
     // float: right;
     display: none;
-    i:first-child {
+    i {
       margin-right: 5px;
     }
   }
