@@ -492,3 +492,30 @@ export const getNode = (arr, node) => {
     }
   }
 }
+
+export const modifyNode = (tree, nodes, property, flag) => {
+  for (let i = 0; i < tree.length; i++) {
+    const currentNode = tree[i]
+    if (nodes && nodes.length > 0) {
+      if (nodes.includes(currentNode._id)) {
+        const tmp = { ...currentNode }
+        tmp[property] = flag
+        tree.splice(i, 1, tmp)
+      }
+    } else {
+      const tmp = { ...currentNode }
+      tmp[property] = flag
+      tree.splice(i, 1, tmp)
+    }
+
+    if (currentNode.children && currentNode.children.length > 0) {
+      modifyNode(currentNode.children, nodes, property, flag)
+    }
+
+    if (currentNode.operations && currentNode.operations.length > 0) {
+      modifyNode(currentNode.operations, nodes, '_' + property, flag)
+    }
+  }
+
+  return tree
+}

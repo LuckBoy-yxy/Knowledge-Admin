@@ -146,6 +146,8 @@ import OperationsTable from './operations.vue'
 
 import { getMenu } from '@/api/admin'
 
+import { modifyNode } from '@/libs/util'
+
 export default {
   name: 'MenuManagement',
   components: {
@@ -162,7 +164,16 @@ export default {
       roleIndex: '',
       menuData: [],
       roles: [
-        { name: '超级管理员', role: 'super_admin' }
+        {
+          name: '超级管理员',
+          role: 'super_admin',
+          menu: [
+            '673c7bf7dbfd00656f1a4a2c',
+            '6742b9f32d5df79d7eeb55ea',
+            '6742b9f32d5df79d7eeb55eb',
+            '6742e2112d5df79d7eeb5721'
+          ]
+        }
       ],
       formData: {
         name: '',
@@ -244,6 +255,7 @@ export default {
     }
   },
   mounted () {
+    window.vue = this
     this._getMenu()
   },
   methods: {
@@ -257,7 +269,13 @@ export default {
     selectRole (index) {
       if (this.roleIndex === '' || this.roleIndex !== index) {
         this.roleIndex = index
+        modifyNode(this.menuData, this.roles[index].menu, 'checked', true)
+        if (this.selectNode.length > 0 && this.selectNode[0].operations) {
+          this.tableData = this.selectNode[0].operations
+        }
       } else {
+        modifyNode(this.menuData, null, 'checked', false)
+        this.tableData = []
         this.roleIndex = ''
       }
     },
