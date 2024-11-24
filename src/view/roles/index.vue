@@ -69,7 +69,12 @@
               >取消</Button>
             </ButtonGroup>
           </div>
-          <Tree :data="menuData" show-checkbox></Tree>
+
+          <Tree
+            :data="menuData"
+            show-checkbox
+            @on-select-change="handleTreeSelect"
+          />
         </Card>
       </Col>
 
@@ -94,42 +99,44 @@
     <Modal
       v-model="showAdd"
       title="添加角色"
-      @on-ok="ok"
+      @on-ok="modalSubmit"
       @on-cancel="modalCancel"
     >
-    <Form
-      ref="form"
-      :model="formData"
-      :label-width="80"
-      :rules="formRules"
-    >
-      <FormItem label="角色名称" prop="name">
-        <Input
-          v-model="formData.name"
-          placeholder="请输入角色名称"
-        />
-      </FormItem>
+      <Form
+        ref="form"
+        :model="formData"
+        :label-width="80"
+        :rules="formRules"
+      >
+        <FormItem label="角色名称" prop="name">
+          <Input
+            v-model="formData.name"
+            placeholder="请输入角色名称"
+          />
+        </FormItem>
 
-      <FormItem label="角色编码" prop="role">
-        <Input
-          v-model="formData.role"
-          placeholder="请输入角色编码"
-        />
-      </FormItem>
+        <FormItem label="角色编码" prop="role">
+          <Input
+            v-model="formData.role"
+            placeholder="请输入角色编码"
+          />
+        </FormItem>
 
-      <FormItem label="角色描述">
-        <Input
-          v-model="formData.desc"
-          placeholder="请输入角色描述"
-        />
-      </FormItem>
-    </Form>
+        <FormItem label="角色描述">
+          <Input
+            v-model="formData.desc"
+            placeholder="请输入角色描述"
+          />
+        </FormItem>
+      </Form>
     </Modal>
   </div>
 </template>
 
 <script>
 import OperationsTable from './operations.vue'
+
+import { getMenu } from '@/api/admin'
 
 export default {
   name: 'MenuManagement',
@@ -142,38 +149,7 @@ export default {
       showAdd: false,
       selectNode: [],
       roleIndex: '',
-      menuData: [
-        {
-          title: 'parent 1',
-          expand: true,
-          children: [
-            {
-              title: 'parent 1-1',
-              expand: true,
-              children: [
-                {
-                  title: 'leaf 1-1-1'
-                },
-                {
-                  title: 'leaf 1-1-2'
-                }
-              ]
-            },
-            {
-              title: 'parent 1-2',
-              expand: true,
-              children: [
-                {
-                  title: 'leaf 1-2-1'
-                },
-                {
-                  title: 'leaf 1-2-1'
-                }
-              ]
-            }
-          ]
-        }
-      ],
+      menuData: [],
       roles: [
         { title: 'parent1' },
         { title: 'parent2' },
@@ -260,7 +236,17 @@ export default {
       ]
     }
   },
+  mounted () {
+    this._getMenu()
+  },
   methods: {
+    _getMenu () {
+      getMenu().then(res => {
+        if (res.code === 200) {
+          this.menuData = res.data
+        }
+      })
+    },
     selectRole (index) {
       if (this.roleIndex === '' || this.roleIndex !== index) {
         this.roleIndex = index
@@ -282,16 +268,7 @@ export default {
     cancel () {
       this.isEdit = false
     },
-    // addMenu () {
-
-    // },
-    // editMenu () {
-
-    // },
-    // deleteMenu () {
-
-    // },
-    ok () {
+    modalSubmit () {
       this.$refs.form.validate(valid => {
         if (valid) {
           console.log('1111')
@@ -306,12 +283,8 @@ export default {
         this.table = []
         return
       }
-      if (!this.isEdit) {
-        this.selectNode = item
-        this.tableData = item[0].operations.length ? [...item[0].operations] : []
-      } else {
-        this.$Message.info('当前为编辑状态, 请取消编辑再查看')
-      }
+      this.selectNode = item
+      this.tableData = item[0].operations.length ? [...item[0].operations] : []
     },
     handelTableChange (table) {
       this.tableData = table
