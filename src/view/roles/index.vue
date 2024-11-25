@@ -81,6 +81,7 @@
             :data="menuData"
             show-checkbox
             @on-select-change="handleTreeSelect"
+            @on-check-change="handleTreeChecked"
           />
         </Card>
       </Col>
@@ -263,13 +264,20 @@ export default {
       getMenu().then(res => {
         if (res.code === 200) {
           this.menuData = res.data
+          localStorage.setItem('menuData', JSON.stringify(this.menuData))
         }
       })
     },
     selectRole (index) {
       if (this.roleIndex === '' || this.roleIndex !== index) {
         this.roleIndex = index
-        modifyNode(this.menuData, this.roles[index].menu, 'checked', true)
+        const tmpData = modifyNode(
+          this.menuData,
+          this.roles[index].menu,
+          'checked',
+          true
+        )
+        localStorage.setItem('menuData', JSON.stringify(tmpData))
         if (this.selectNode.length > 0 && this.selectNode[0].operations) {
           this.tableData = this.selectNode[0].operations
         }
@@ -345,12 +353,21 @@ export default {
     },
     handleTreeSelect (item) {
       if (item.length === 0) {
-        this.table = []
+        this.tableData = []
         return
       }
 
       this.selectNode = item
       this.tableData = item[0].operations.length ? [...item[0].operations] : []
+    },
+    handleTreeChecked (item) {
+      if (!this.isEdit) {
+        const tmpData = localStorage.getItem('menuData')
+        if (typeof tmpData !== 'undefined' && tmpData) {
+          this.menuData = JSON.parse(tmpData)
+        }
+        this.$Message.info('当前并不是编辑状态, 请选择角色进行编辑')
+      }
     },
     handelTableChange (table) {
       this.tableData = table
