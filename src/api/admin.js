@@ -46,3 +46,19 @@ export const deleteMenu = data => {
 export const getMenu = () => {
   return request.get('/admin/get-menu')
 }
+
+export const addRole = data => {
+  return request.post('/admin/add-role', data)
+}
+
+export const updateRole = data => {
+  return request.post('/admin/update-role', data)
+}
+
+export const deleteRole = data => {
+  return request.post('/admin/delete-role', data)
+}
+
+export const getRoles = () => {
+  return request.get('/admin/get-roles')
+}

@@ -145,7 +145,7 @@
 <script>
 import OperationsTable from './operations.vue'
 
-import { getMenu } from '@/api/admin'
+import { getMenu, getRoles, addRole, updateRole, deleteRole } from '@/api/admin'
 
 import { modifyNode, getPropertyIds } from '@/libs/util'
 
@@ -164,18 +164,7 @@ export default {
       editIndex: '',
       roleIndex: '',
       menuData: [],
-      roles: [
-        {
-          name: '超级管理员',
-          role: 'super_admin',
-          menu: [
-            '673c7bf7dbfd00656f1a4a2c',
-            '6742b9f32d5df79d7eeb55ea',
-            '6742b9f32d5df79d7eeb55eb',
-            '6742e2112d5df79d7eeb5721'
-          ]
-        }
-      ],
+      roles: [],
       formData: {
         name: '',
         role: '',
@@ -258,6 +247,7 @@ export default {
   mounted () {
     window.vue = this
     this._getMenu()
+    this._getRoles()
   },
   methods: {
     _getMenu () {
@@ -268,9 +258,17 @@ export default {
         }
       })
     },
+    _getRoles () {
+      getRoles().then(res => {
+        if (res.code === 200) {
+          this.roles = res.data
+        }
+      })
+    },
     selectRole (index) {
       if (this.roleIndex === '' || this.roleIndex !== index) {
         this.roleIndex = index
+        if (!this.roles[index].menu || this.roles[index].menu.length === 0) return
         const tmpData = modifyNode(
           this.menuData,
           this.roles[index].menu,
@@ -307,8 +305,12 @@ export default {
         content: `删除 ${role.name} 角色吗`,
         onOk: () => {
           // this.roles = this.roles.filter(item => (item.name !== role.name))
-          this.roles.splice(index, 1)
-          this.$Message.success('删除角色成功')
+          deleteRole({ _id: role._id }).then(res => {
+            if (res.code === 200) {
+              this.roles.splice(index, 1)
+              this.$Message.success('删除角色成功')
+            }
+          })
         },
         onCancel: () => {
           this.$Message.info('取消操作')
@@ -317,10 +319,18 @@ export default {
     },
     submit () {
       this.isEdit = false
-      this.roles[this.roleIndex].menu = getPropertyIds(
+      const menus = getPropertyIds(
         this.menuData,
         ['children', 'operations']
       )
+      const tmp = { ...this.roles[this.roleIndex] }
+      tmp.menu = menus
+      this.roles.splice(this.roleIndex, 1, tmp)
+      updateRole(tmp).then(res => {
+        if (res.code === 200) {
+          this.$Message.success('角色权限更新成功')
+        }
+      })
       localStorage.setItem('menuData', JSON.stringify(this.menuData))
     },
     cancel () {
@@ -337,11 +347,21 @@ export default {
         if (valid) {
           this.loading = false
           if (this.type) {
-            this.roles.splice(this.editIndex, 1, { ...this.formData })
-            this.$Message.success('编辑角色成功')
+            updateRole({ ...this.formData }).then(res => {
+              if (res.code === 200) {
+                // this.roles.splice(this.editIndex, 1, { ...this.formData })
+                this._getRoles()
+                this.$Message.success('编辑角色成功')
+              }
+            })
           } else {
-            this.roles.push({ ...this.formData })
-            this.$Message.success('新增角色成功')
+            addRole({ ...this.formData }).then(res => {
+              if (res.code === 200) {
+                // this.roles.push({ ...this.formData })
+                this._getRoles()
+                this.$Message.success('新增角色成功')
+              }
+            })
           }
           setTimeout(() => {
             this.initForm()
