@@ -258,17 +258,13 @@ export default {
   mounted () {
     window.vue = this
     this._getMenu()
-    localStorage.setItem('menuData', false)
-  },
-  beforeDestroy () {
-    localStorage.setItem('menuData', false)
   },
   methods: {
     _getMenu () {
       getMenu().then(res => {
         if (res.code === 200) {
           this.menuData = res.data
-          // localStorage.setItem('menuData', JSON.stringify(this.menuData))
+          localStorage.setItem('menuData', JSON.stringify(this.menuData))
         }
       })
     },
@@ -289,6 +285,7 @@ export default {
         modifyNode(this.menuData, null, 'checked', false)
         this.tableData = []
         this.roleIndex = ''
+        localStorage.setItem('menuData', JSON.stringify(this.menuData))
       }
     },
     addRole () {
@@ -381,8 +378,6 @@ export default {
         if (typeof tmpData !== 'undefined') {
           if (tmpData) {
             this.menuData = tmpData
-          } else {
-            this.menuData = modifyNode(this.menuData, null, 'checked', false)
           }
         }
         this.$Message.info('当前并不是编辑状态, 请选择角色进行编辑')
