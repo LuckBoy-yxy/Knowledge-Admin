@@ -97,6 +97,7 @@ export default {
         }, 0)
       } else {
         this.selections = seletcion
+        this.$emit('on-change', seletcion)
       }
     }
   },
@@ -104,10 +105,10 @@ export default {
     tableData (newVal) {
       localStorage.setItem('localData', JSON.stringify(newVal))
       this.localData = newVal
-    },
-    localData () {
-      this.$emit('on-change', this.localData)
     }
+    // localData () {
+    //   this.$emit('on-change', this.localData)
+    // }
   }
 }
 </script>

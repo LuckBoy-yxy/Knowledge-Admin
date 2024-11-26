@@ -147,7 +147,7 @@ import OperationsTable from './operations.vue'
 
 import { getMenu } from '@/api/admin'
 
-import { modifyNode } from '@/libs/util'
+import { modifyNode, getPropertyIds } from '@/libs/util'
 
 export default {
   name: 'MenuManagement',
@@ -258,13 +258,17 @@ export default {
   mounted () {
     window.vue = this
     this._getMenu()
+    localStorage.setItem('menuData', false)
+  },
+  beforeDestroy () {
+    localStorage.setItem('menuData', false)
   },
   methods: {
     _getMenu () {
       getMenu().then(res => {
         if (res.code === 200) {
           this.menuData = res.data
-          localStorage.setItem('menuData', JSON.stringify(this.menuData))
+          // localStorage.setItem('menuData', JSON.stringify(this.menuData))
         }
       })
     },
@@ -316,9 +320,20 @@ export default {
     },
     submit () {
       this.isEdit = false
+      this.roles[this.roleIndex].menu = getPropertyIds(
+        this.menuData,
+        ['children', 'operations']
+      )
+      localStorage.setItem('menuData', JSON.stringify(this.menuData))
     },
     cancel () {
       this.isEdit = false
+      const tmpData = JSON.parse(localStorage.getItem('menuData'))
+      if (tmpData && typeof tmpData !== 'undefined') {
+        this.menuData = tmpData
+        this.tableData = []
+        this.selectNode = []
+      }
     },
     modalSubmit () {
       this.$refs.form.validate(valid => {
@@ -362,15 +377,29 @@ export default {
     },
     handleTreeChecked (item) {
       if (!this.isEdit) {
-        const tmpData = localStorage.getItem('menuData')
-        if (typeof tmpData !== 'undefined' && tmpData) {
-          this.menuData = JSON.parse(tmpData)
+        const tmpData = JSON.parse(localStorage.getItem('menuData'))
+        if (typeof tmpData !== 'undefined') {
+          if (tmpData) {
+            this.menuData = tmpData
+          } else {
+            this.menuData = modifyNode(this.menuData, null, 'checked', false)
+          }
         }
         this.$Message.info('当前并不是编辑状态, 请选择角色进行编辑')
       }
     },
     handelTableChange (table) {
-      this.tableData = table
+      // this.selectNode[0].operations = table
+      const ids = table.map(item => item._id)
+      if (this.selectNode.length > 0 && this.selectNode[0].operations) {
+        this.selectNode[0].operations.forEach(item => {
+          if (!ids.includes(item._id)) {
+            item._checked = false
+          } else {
+            item._checked = true
+          }
+        })
+      }
     }
   }
 }

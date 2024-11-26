@@ -519,3 +519,27 @@ export const modifyNode = (tree, nodes, property, flag) => {
 
   return tree
 }
+
+export const flatten = (arr) => {
+  while (arr.some((item) => Array.isArray(item))) {
+    arr = [].concat(...arr)
+  }
+  return arr
+}
+
+export const getPropertyIds = (menu, properties) => {
+  const arr = []
+  menu.forEach((item) => {
+    if (item.checked || item._checked) {
+      arr.push(item._id)
+    }
+
+    properties.forEach((property) => {
+      if (item[property] && item[property].length > 0) {
+        arr.push(getPropertyIds(item[property], properties))
+      }
+    })
+  })
+
+  return flatten(arr)
+}
