@@ -51,6 +51,19 @@
           ></Input>
         </FormItem>
 
+        <FormItem label="角色" prop="roles">
+          <Select
+            v-model="formData.roles"
+            multiple
+          >
+            <Option
+              v-for="(item, index) in roleArr"
+              :value="item.role"
+              :key="'role' + index"
+            >{{ item.name }}</Option>
+          </Select>
+        </FormItem>
+
         <FormItem label="所在城市">
           <Input
             prefix="md-pin"
@@ -135,6 +148,10 @@ export default {
     isShow: {
       type: Boolean,
       default: false
+    },
+    roleArr: {
+      type: Array,
+      default: () => []
     }
   },
   data () {
@@ -145,6 +162,7 @@ export default {
         name: '',
         username: '',
         password: '',
+        roles: ['user'],
         mobile: '',
         gender: '0',
         status: '0',
@@ -168,6 +186,9 @@ export default {
           { required: true, message: '请输入密码', trigger: 'blur' },
           { type: 'string', min: 6, message: '密码长度至少为 6 位', trigger: 'change' },
           { type: 'string', max: 20, message: '密码长度最多为 20 位', trigger: 'change' }
+        ],
+        roles: [
+          { required: true, message: '请选择角色', trigger: 'blur' }
         ],
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },

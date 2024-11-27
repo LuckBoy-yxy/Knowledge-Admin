@@ -59,6 +59,7 @@
     <Edit
       :isShow="isShow"
       :item="currentItem"
+      :roleArr="roles"
       @eidtEvent="handleEdit"
       @changeEvent="handleCancel"
     />
@@ -66,6 +67,7 @@
     <Add
       ref="addModel"
       :isShow="showAdd"
+      :roleArr="roles"
       @AddEvent="submitAddUser"
       @AddCancelEvent="handleAddCancel"
     />
@@ -73,6 +75,7 @@
     <BatchSet
       ref="batchSet"
       :isShow="showSet"
+      :roleArr="roles"
       @batchSetEvent="handleBatchSet"
       @batchCencelEvent="handleBatchCancel"
     />
@@ -92,11 +95,13 @@ import {
   updateUserById,
   deleteUserById,
   addUser,
-  updateUserBatchById
+  updateUserBatchById,
+  getRoleNames
 } from '@/api/admin'
 
 export default {
   name: 'UserManagement',
+  // name: 'user_management',
   components: {
     Tables,
     Edit,
@@ -136,8 +141,11 @@ export default {
           align: 'center',
           minWidth: 400,
           render: (h, params) => {
+            const roleNames = params.row.roles
+              .map(item => this.roleNames[item])
+              .join(',')
             return h('div', [
-              h('span', params.row.roles.join(','))
+              h('span', roleNames)
             ])
           },
           search: {
@@ -256,11 +264,23 @@ export default {
       showAdd: false,
       selection: [],
       showSet: false,
-      option: {}
+      option: {},
+      roles: []
+    }
+  },
+  computed: {
+    roleNames () {
+      const tmp = {}
+      this.roles.forEach(item => {
+        tmp[item.role] = item.name
+      })
+
+      return tmp
     }
   },
   mounted () {
     this._getList()
+    this._getRoleNames()
   },
   methods: {
     _getList () {
@@ -272,6 +292,13 @@ export default {
         if (res.code === 200) {
           this.tableData = res.data
           this.total = res.total
+        }
+      })
+    },
+    _getRoleNames () {
+      getRoleNames().then(res => {
+        if (res.code === 200) {
+          this.roles = res.data
         }
       })
     },

@@ -11,16 +11,16 @@
         :model="localItem"
         :label-width="80"
       >
-        <FormItem label="标签">
+        <FormItem label="角色">
           <Select
             v-model="localItem.roles"
             multiple
           >
             <Option
-              v-for="(item, index) in roles"
-              :value="item"
+              v-for="(item, index) in roleArr"
+              :value="item.role"
               :key="'tags' + index"
-            >{{ item }}</Option>
+            >{{ item.name }}</Option>
           </Select>
         </FormItem>
 
@@ -49,12 +49,16 @@ export default {
     isShow: {
       type: Boolean,
       default: false
+    },
+    roleArr: {
+      type: Array,
+      default: () => []
     }
   },
   data () {
     return {
       showStatus: false,
-      roles: ['user', 'admin', 'super_admin'],
+      // roles: ['user', 'admin', 'super_admin'],
       localItem: {
         status: '0',
         isVip: '0',

@@ -62,3 +62,7 @@ export const deleteRole = data => {
 export const getRoles = () => {
   return request.get('/admin/get-roles')
 }
+
+export const getRoleNames = () => {
+  return request.get('/admin/get-role-names')
+}

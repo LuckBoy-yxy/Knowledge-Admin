@@ -268,16 +268,19 @@ export default {
     selectRole (index) {
       if (this.roleIndex === '' || this.roleIndex !== index) {
         this.roleIndex = index
-        if (!this.roles[index].menu || this.roles[index].menu.length === 0) return
-        const tmpData = modifyNode(
-          this.menuData,
-          this.roles[index].menu,
-          'checked',
-          true
-        )
-        localStorage.setItem('menuData', JSON.stringify(tmpData))
-        if (this.selectNode.length > 0 && this.selectNode[0].operations) {
-          this.tableData = this.selectNode[0].operations
+        if (!this.roles[index].menu || this.roles[index].menu.length === 0) {
+          modifyNode(this.menuData, null, 'checked', false)
+        } else {
+          const tmpData = modifyNode(
+            this.menuData,
+            this.roles[index].menu,
+            'checked',
+            true
+          )
+          localStorage.setItem('menuData', JSON.stringify(tmpData))
+          if (this.selectNode.length > 0 && this.selectNode[0].operations) {
+            this.tableData = this.selectNode[0].operations
+          }
         }
       } else {
         modifyNode(this.menuData, null, 'checked', false)

@@ -34,6 +34,19 @@
           ></Input>
         </FormItem>
 
+        <FormItem label="角色" prop="roles">
+          <Select
+            v-model="localItem.roles"
+            multiple
+          >
+            <Option
+              v-for="(item, index) in roleArr"
+              :value="item.role"
+              :key="'role' + index"
+            >{{ item.name }}</Option>
+          </Select>
+        </FormItem>
+
         <FormItem label="是否禁用">
           <RadioGroup v-model="localItem.status">
             <Radio label="0">否</Radio>
@@ -138,6 +151,10 @@ export default {
     item: {
       type: Object,
       default: () => {}
+    },
+    roleArr: {
+      type: Array,
+      default: () => []
     }
   },
   data () {
@@ -148,6 +165,7 @@ export default {
         name: '',
         username: '',
         password: '',
+        roles: [],
         status: '0',
         isVip: '0',
         favs: 0
@@ -168,6 +186,9 @@ export default {
           // { required: true, message: '请输入密码', trigger: 'blur' },
           { type: 'string', min: 6, message: '密码长度至少为 6 位', trigger: 'change' },
           { type: 'string', max: 20, message: '密码长度最多为 20 位', trigger: 'change' }
+        ],
+        roles: [
+          { required: true, message: '请选择角色', trigger: 'blur' }
         ],
         favs: [
           // { required: true, message: '请输入用户积分', trigger: 'blur' },
