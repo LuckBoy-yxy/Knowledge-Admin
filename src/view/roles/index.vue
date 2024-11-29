@@ -271,6 +271,7 @@ export default {
         if (!this.roles[index].menu || this.roles[index].menu.length === 0) {
           modifyNode(this.menuData, null, 'checked', false)
         } else {
+          modifyNode(this.menuData, null, 'checked', false)
           const tmpData = modifyNode(
             this.menuData,
             this.roles[index].menu,

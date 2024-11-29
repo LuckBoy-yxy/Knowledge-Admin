@@ -295,6 +295,7 @@ export default {
       this.type = ''
       this.isEdit = false
       this.formData = {
+        title: '',
         name: '',
         path: '',
         component: '',
@@ -305,6 +306,7 @@ export default {
         sort: 0,
         redirect: '',
         type: 'menu',
+        link: '',
         operations: []
       }
       this.tableData = []

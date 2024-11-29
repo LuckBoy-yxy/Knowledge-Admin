@@ -21,15 +21,56 @@
         />
       </FormItem>
 
-      <FormItem label="组件" prop="component">
-        <Input
-          v-model="formData.component"
-          placeholder="请输入前端组件名称"
-        >
-          <span slot="prepend">()=>import('@/view</span>
-          <span slot="append">.vue')</span>
-        </Input>
-      </FormItem>
+      <template v-if="formData.type !== 'link'">
+        <FormItem label="组件名称" prop="name">
+          <Input
+            v-model="formData.name"
+            placeholder="请输入菜单名称"
+          />
+        </FormItem>
+
+        <FormItem label="组件">
+          <Input
+            v-model="formData.component"
+            placeholder="请输入前端组件名称"
+          >
+            <span slot="prepend">()=>import('@</span>
+            <span slot="append">.vue')</span>
+          </Input>
+        </FormItem>
+
+        <FormItem label="菜单显示">
+          隐藏&nbsp;
+          <i-switch
+            v-model="formData.hideInMenu"
+          />
+          &nbsp;显示
+        </FormItem>
+
+        <FormItem label="缓存">
+          使用&nbsp;
+          <i-switch
+            v-model="formData.notCache"
+          />
+          &nbsp;不使用
+        </FormItem>
+
+        <FormItem label="面包屑">
+          隐藏&nbsp;
+          <i-switch
+            v-model="formData.hideInBread"
+          />
+          &nbsp;显示
+        </FormItem>
+      </template>
+      <template v-else>
+        <FormItem label="链接" prop="link">
+          <Input
+            v-model="formData.link"
+            placeholder="请输入跳转路径"
+          />
+        </FormItem>
+      </template>
 
       <FormItem label="排序">
         <Input
@@ -37,14 +78,6 @@
           placeholder="组件默认排序"
           style="width: 100px"
         />
-      </FormItem>
-
-      <FormItem label="面包屑">
-        隐藏&nbsp;
-        <i-switch
-          v-model="formData.hideInBread"
-        />
-        &nbsp;显示
       </FormItem>
 
       <FormItem label="菜单类型">
@@ -55,23 +88,8 @@
         >
           <Option value="menu">目录</Option>
           <Option value="resource">资源</Option>
+          <Option value="link">链接</Option>
         </Select>
-      </FormItem>
-
-      <FormItem label="菜单显示">
-        隐藏&nbsp;
-        <i-switch
-          v-model="formData.hideInMenu"
-        />
-        &nbsp;显示
-      </FormItem>
-
-      <FormItem label="缓存">
-        不使用&nbsp;
-        <i-switch
-          v-model="formData.notCache"
-        />
-        &nbsp;使用
       </FormItem>
 
       <FormItem label="图标">
@@ -113,6 +131,7 @@ export default {
     return {
       formData: {
         title: '',
+        name: '',
         path: '',
         component: '',
         hideInBread: false,
@@ -122,17 +141,24 @@ export default {
         sort: 0,
         redirect: '',
         type: 'menu',
+        link: '',
         operations: []
       },
       formRules: {
         title: [
           { required: true, message: '菜单标题不能为空', trigger: 'blur' }
         ],
+        name: [
+          { required: true, message: '组件名称不能为空', trigger: 'blur' }
+        ],
         path: [
           { required: true, message: '菜单路径不能为空', trigger: 'blur' }
         ],
         component: [
           { required: true, message: '前端组件不得为空', trigger: 'blur' }
+        ],
+        link: [
+          { required: true, message: '跳转路径不得为空', trigger: 'blur' }
         ]
       }
     }
