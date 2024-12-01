@@ -120,6 +120,14 @@ const userNamePassCheck = (rule, value, callback) => {
   })
 }
 
+const rolesCheck = (rule, value, callback) => {
+  if (value.length === 0) {
+    callback(new Error('请选择角色'))
+  } else {
+    callback()
+  }
+}
+
 const mobilePassCheck = (rule, value, callback) => {
   if (!/^1[3456789]\d{9}$/.test(value)) {
     callback(new Error('请输入正确的手机号'))
@@ -188,7 +196,8 @@ export default {
           { type: 'string', max: 20, message: '密码长度最多为 20 位', trigger: 'change' }
         ],
         roles: [
-          { required: true, message: '请选择角色', trigger: 'blur' }
+          // { required: true, message: '请选择角色', trigger: 'blur' }
+          { validator: rolesCheck, trigger: 'blur' }
         ],
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },

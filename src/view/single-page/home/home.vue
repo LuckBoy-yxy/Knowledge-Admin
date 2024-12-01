@@ -2,7 +2,13 @@
   <div>
     <Row :gutter="20">
       <i-col :xs="12" :md="8" :lg="4" v-for="(infor, i) in inforCardData" :key="`infor-${i}`" style="height: 120px;padding-bottom: 10px;">
-        <infor-card shadow :color="infor.color" :icon="infor.icon" :icon-size="36">
+        <infor-card
+          shadow
+          :color="infor.color"
+          :icon="infor.icon"
+          :icon-size="36"
+          :key="timer"
+        >
           <count-to :end="infor.count" count-class="count-style"/>
           <p>{{ infor.title }}</p>
         </infor-card>
@@ -33,6 +39,8 @@ import InforCard from '_c/info-card'
 import CountTo from '_c/count-to'
 import { ChartPie, ChartBar } from '_c/charts'
 import Example from './example.vue'
+
+import { getStatData } from '@/api/admin'
 export default {
   name: 'home',
   components: {
@@ -44,13 +52,14 @@ export default {
   },
   data () {
     return {
+      timer: 0,
       inforCardData: [
-        { title: '新增用户', icon: 'md-person-add', count: 803, color: '#2d8cf0' },
-        { title: '累计点击', icon: 'md-locate', count: 232, color: '#19be6b' },
-        { title: '新增问答', icon: 'md-help-circle', count: 142, color: '#ff9900' },
-        { title: '分享统计', icon: 'md-share', count: 657, color: '#ed3f14' },
-        { title: '新增互动', icon: 'md-chatbubbles', count: 12, color: '#E46CBB' },
-        { title: '新增页面', icon: 'md-map', count: 14, color: '#9A66E4' }
+        { title: '新增用户', icon: 'md-person-add', count: 0, color: '#2d8cf0' },
+        { title: '累计发帖', icon: 'md-locate', count: 0, color: '#19be6b' },
+        { title: '新增评论', icon: 'md-help-circle', count: 0, color: '#ff9900' },
+        { title: '本周采纳', icon: 'md-share', count: 0, color: '#ed3f14' },
+        { title: '本周签到', icon: 'md-chatbubbles', count: 0, color: '#E46CBB' },
+        { title: '本周发帖', icon: 'md-map', count: 0, color: '#9A66E4' }
       ],
       pieData: [
         { value: 335, name: '直接访问' },
@@ -71,7 +80,29 @@ export default {
     }
   },
   mounted () {
-    //
+    this.getData()
+  },
+  methods: {
+    getData () {
+      getStatData().then(res => {
+        if (res.code === 200 && res.data.inforCardData) {
+          // res.data.inforCardData.forEach((item, index) => {
+          //   this.inforCardData.splice(index, 1, {
+          //     ...this.inforCardData[index],
+          //     count: res.data.inforCardData[index]
+          //   })
+          // })
+          // res.data.inforCardData.forEach((item, index) => {
+          //   this.$set(this.inforCardData, index, {
+          //     ...this.inforCardData[index],
+          //     count: res.data.inforCardData[index]
+          //   })
+          // })
+          this.inforCardData[0].count = res.data.inforCardData[0]
+          this.timer = new Date().getTime()
+        }
+      })
+    }
   }
 }
 </script>

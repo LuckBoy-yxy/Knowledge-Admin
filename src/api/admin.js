@@ -66,3 +66,7 @@ export const getRoles = () => {
 export const getRoleNames = () => {
   return request.get('/admin/get-role-names')
 }
+
+export const getStatData = () => {
+  return request.get('/admin/getStat')
+}
