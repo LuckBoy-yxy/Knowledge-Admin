@@ -98,7 +98,9 @@ export default {
           //     count: res.data.inforCardData[index]
           //   })
           // })
-          this.inforCardData[0].count = res.data.inforCardData[0]
+          this.inforCardData.forEach((item, index) => {
+            item.count = res.data.inforCardData[index]
+          })
           this.timer = new Date().getTime()
         }
       })
