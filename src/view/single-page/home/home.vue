@@ -28,7 +28,12 @@
       </i-col>
       <i-col :md="24" :lg="16" style="margin-bottom: 20px;">
         <Card shadow>
-          <chart-bar style="height: 300px;" :value="barData" text="每周用户活跃量"/>
+          <chart-bar
+            style="height: 300px;"
+            :value="barData"
+            text="近 6 月的累计发帖"
+            :key="barTimer"
+          />
         </Card>
       </i-col>
     </Row>
@@ -46,6 +51,8 @@ import CountTo from '_c/count-to'
 import { ChartPie, ChartBar } from '_c/charts'
 import Example from './example.vue'
 
+import dayjs from 'dayjs'
+
 import { getStatData } from '@/api/admin'
 export default {
   name: 'home',
@@ -60,6 +67,7 @@ export default {
     return {
       cardTimer: 0,
       pieTimer: 0,
+      barTimer: 0,
       inforCardData: [
         { title: '新增用户', icon: 'md-person-add', count: 0, color: '#2d8cf0' },
         { title: '累计发帖', icon: 'md-locate', count: 0, color: '#19be6b' },
@@ -76,15 +84,7 @@ export default {
         // { value: 0, name: '动态' },
         // { value: 0, name: '公告' }
       ],
-      barData: {
-        Mon: 13253,
-        Tue: 34235,
-        Wed: 26321,
-        Thu: 12340,
-        Fri: 24643,
-        Sat: 1322,
-        Sun: 1324
-      }
+      barData: {}
     }
   },
   mounted () {
@@ -109,6 +109,15 @@ export default {
             arr.push({ name: '建议', value: pieData.advise || 0 })
             this.pieData = arr
             this.pieTimer = new Date().getTime()
+          }
+          if (res.data.monthData) {
+            const result = {}
+            for (let i = 0; i <= 5; i++) {
+              const key = dayjs().subtract(5 - i, 'M').format('YYYY-MM')
+              result[key] = res.data.monthData[key] || 0
+            }
+            this.barData = result
+            this.barTimer = new Date().getTime()
           }
         }
       })
