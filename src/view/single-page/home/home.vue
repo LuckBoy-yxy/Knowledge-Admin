@@ -7,7 +7,7 @@
           :color="infor.color"
           :icon="infor.icon"
           :icon-size="36"
-          :key="timer"
+          :key="cardTimer"
         >
           <count-to :end="infor.count" count-class="count-style"/>
           <p>{{ infor.title }}</p>
@@ -17,7 +17,13 @@
     <Row :gutter="20" style="margin-top: 10px;">
       <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
         <Card shadow>
-          <chart-pie style="height: 300px;" :value="pieData" text="用户访问来源"></chart-pie>
+          <chart-pie
+            style="height: 300px;"
+            :value="pieData"
+            text="发帖统计"
+            toolTipName="统计内容"
+            :key="pieTimer"
+          ></chart-pie>
         </Card>
       </i-col>
       <i-col :md="24" :lg="16" style="margin-bottom: 20px;">
@@ -52,7 +58,8 @@ export default {
   },
   data () {
     return {
-      timer: 0,
+      cardTimer: 0,
+      pieTimer: 0,
       inforCardData: [
         { title: '新增用户', icon: 'md-person-add', count: 0, color: '#2d8cf0' },
         { title: '累计发帖', icon: 'md-locate', count: 0, color: '#19be6b' },
@@ -62,11 +69,12 @@ export default {
         { title: '本周发帖', icon: 'md-map', count: 0, color: '#9A66E4' }
       ],
       pieData: [
-        { value: 335, name: '直接访问' },
-        { value: 310, name: '邮件营销' },
-        { value: 234, name: '联盟广告' },
-        { value: 135, name: '视频广告' },
-        { value: 1548, name: '搜索引擎' }
+        { value: 0, name: '提问' },
+        { value: 0, name: '分享' },
+        { value: 0, name: '讨论' },
+        { value: 0, name: '建议' }
+        // { value: 0, name: '动态' },
+        // { value: 0, name: '公告' }
       ],
       barData: {
         Mon: 13253,
@@ -85,23 +93,23 @@ export default {
   methods: {
     getData () {
       getStatData().then(res => {
-        if (res.code === 200 && res.data.inforCardData) {
-          // res.data.inforCardData.forEach((item, index) => {
-          //   this.inforCardData.splice(index, 1, {
-          //     ...this.inforCardData[index],
-          //     count: res.data.inforCardData[index]
-          //   })
-          // })
-          // res.data.inforCardData.forEach((item, index) => {
-          //   this.$set(this.inforCardData, index, {
-          //     ...this.inforCardData[index],
-          //     count: res.data.inforCardData[index]
-          //   })
-          // })
-          this.inforCardData.forEach((item, index) => {
-            item.count = res.data.inforCardData[index]
-          })
-          this.timer = new Date().getTime()
+        if (res.code === 200) {
+          if (res.data.inforCardData) {
+            this.inforCardData.forEach((item, index) => {
+              item.count = res.data.inforCardData[index]
+            })
+            this.cardTimer = new Date().getTime()
+          }
+          if (res.data.pieData) {
+            const arr = []
+            const pieData = res.data.pieData
+            arr.push({ name: '提问', value: pieData.ask || 0 })
+            arr.push({ name: '分享', value: pieData.share || 0 })
+            arr.push({ name: '讨论', value: pieData.discuss || 0 })
+            arr.push({ name: '建议', value: pieData.advise || 0 })
+            this.pieData = arr
+            this.pieTimer = new Date().getTime()
+          }
         }
       })
     }

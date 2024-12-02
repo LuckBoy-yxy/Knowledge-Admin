@@ -12,7 +12,8 @@ export default {
   props: {
     value: Array,
     text: String,
-    subtext: String
+    subtext: String,
+    toolTipName: String
   },
   data () {
     return {
@@ -44,6 +45,7 @@ export default {
         },
         series: [
           {
+            name: this.toolTipName,
             type: 'pie',
             radius: '55%',
             center: ['50%', '60%'],
