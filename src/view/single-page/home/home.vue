@@ -39,7 +39,11 @@
     </Row>
     <Row>
       <Card shadow>
-        <example style="height: 310px;"/>
+        <WeekStat
+          :weekData="weekData"
+          style="height: 310px;"
+          :key="weekTimer"
+        />
       </Card>
     </Row>
   </div>
@@ -49,7 +53,7 @@
 import InforCard from '_c/info-card'
 import CountTo from '_c/count-to'
 import { ChartPie, ChartBar } from '_c/charts'
-import Example from './example.vue'
+import WeekStat from './weekStat'
 
 import dayjs from 'dayjs'
 
@@ -61,13 +65,14 @@ export default {
     CountTo,
     ChartPie,
     ChartBar,
-    Example
+    WeekStat
   },
   data () {
     return {
       cardTimer: 0,
       pieTimer: 0,
       barTimer: 0,
+      weekTimer: 0,
       inforCardData: [
         { title: '新增用户', icon: 'md-person-add', count: 0, color: '#2d8cf0' },
         { title: '累计发帖', icon: 'md-locate', count: 0, color: '#19be6b' },
@@ -84,7 +89,8 @@ export default {
         // { value: 0, name: '动态' },
         // { value: 0, name: '公告' }
       ],
-      barData: {}
+      barData: {},
+      weekData: {}
     }
   },
   mounted () {
@@ -118,6 +124,10 @@ export default {
             }
             this.barData = result
             this.barTimer = new Date().getTime()
+          }
+          if (res.data.weekData) {
+            this.weekData = res.data.weekData
+            this.weekTimer = new Date().getTime()
           }
         }
       })
