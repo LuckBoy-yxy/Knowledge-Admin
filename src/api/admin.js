@@ -70,3 +70,11 @@ export const getRoleNames = () => {
 export const getStatData = () => {
   return request.get('/admin/getStat')
 }
+
+export const getErrorList = params => {
+  return request.get('/admin/get-error?' + qs.stringify(params))
+}
+
+export const deleteErrors = data => {
+  return request.post('/admin/delete-error', data)
+}
