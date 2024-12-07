@@ -54,5 +54,7 @@ export default {
   'Menu Options': 'Menu Options',
   'Resources': 'Resources',
   'Menu Permission': 'Menu Permission',
-  'Role List': 'Role List'
+  'Role List': 'Role List',
+  system: 'system',
+  logs_check: 'logs_check'
 }

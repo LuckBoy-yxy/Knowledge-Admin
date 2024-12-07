@@ -55,5 +55,7 @@ export default {
   'Menu Options': '菜单选项',
   'Resources': '资源选项',
   'Menu Permission': '菜单权限',
-  'Role List': '角色列表'
+  'Role List': '角色列表',
+  system: '系统设置',
+  logs_check: '错误日志'
 }

@@ -102,5 +102,27 @@ export default [
         component: () => import('@/view/roles/index.vue')
       }
     ]
+  },
+  {
+    path: '/system',
+    name: 'system',
+    meta: {
+      icon: 'md-construct',
+      title: '系统设置',
+      notCache: true
+    },
+    component: Main,
+    children: [
+      {
+        path: 'index',
+        name: 'logs_check',
+        meta: {
+          icon: 'ios-bug',
+          title: '错误日志',
+          notCache: true
+        },
+        component: () => import('@/view/logs/index.vue')
+      }
+    ]
   }
 ]
