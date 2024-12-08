@@ -17,7 +17,6 @@
       >
         <Col class="ctrls">
           <Button @click="deleteErrors">批量删除</Button>
-          <Button @click="handleSetBatch">批量设置</Button>
         </Col>
 
         <Col>
@@ -40,16 +39,14 @@
 
 <script>
 import Expend from './expend.vue'
+import More from './more.vue'
 
 import dayjs from 'dayjs'
 
-import { getErrorList } from '@/api/admin'
+import { getErrorList, deleteErrors } from '@/api/admin'
 
 export default {
   name: 'LogsCheck',
-  // components: {
-  //   Expend
-  // },
   data () {
     return {
       tableData: [],
@@ -99,7 +96,14 @@ export default {
           title: '请求参数',
           key: 'param',
           align: 'center',
-          minWidth: 200
+          minWidth: 200,
+          render: (h, params) => {
+            return h(More, {
+              props: {
+                row: params.row
+              }
+            })
+          }
         },
         {
           title: '日期',
@@ -123,7 +127,8 @@ export default {
       pageSize: 10,
       total: 0,
       pageArr: [10, 20, 30, 50, 100],
-      loading: false
+      loading: false,
+      selections: []
     }
   },
   mounted () {
@@ -151,14 +156,29 @@ export default {
       this.pageSize = pageSize
       this._getErrorList()
     },
-    handleSelect () {
-
+    handleSelect (selectData) {
+      this.selections = selectData
     },
     deleteErrors () {
-
-    },
-    handleSetBatch () {
-
+      if (!this.selections.length) {
+        return this.$Message.info('请先选择需要删除的表格数据')
+      }
+      this.$Modal.confirm({
+        title: '批量删除',
+        content: '确定执行批量删除操作吗?',
+        onOk: () => {
+          const ids = this.selections.map(item => item._id)
+          deleteErrors({ ids }).then(res => {
+            if (res.code === 200) {
+              this.tableData = this.tableData.filter(item => !ids.includes(item._id))
+              this.$Message.success('批量删除成功')
+            }
+          })
+        },
+        onCancel: () => {
+          this.$Message.info('取消操作')
+        }
+      })
     }
   }
 }
