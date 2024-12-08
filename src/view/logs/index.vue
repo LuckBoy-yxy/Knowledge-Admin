@@ -48,6 +48,7 @@ import { getErrorList, deleteErrors } from '@/api/admin'
 export default {
   name: 'LogsCheck',
   data () {
+    const that = this
     return {
       tableData: [],
       columns: [
@@ -78,13 +79,41 @@ export default {
           title: '错误状态码',
           key: 'code',
           align: 'center',
-          minWidth: 180
+          minWidth: 180,
+          filters: [],
+          filterMultiple: false,
+          filterRemote: (value, row) => {
+            // this.filters[row] = value
+
+            const obj = { ...this.filters }
+            if (value[0]) {
+              obj[row] = value[0]
+            } else {
+              delete obj[row]
+            }
+            this.filters = obj
+            // this.$set(this.filters, row, value)
+          }
         },
         {
           title: '请求类型',
           key: 'method',
           align: 'center',
-          minWidth: 180
+          minWidth: 180,
+          filters: [],
+          filterMultiple: false,
+          filterRemote (value, row) {
+            // that.filters[row] = value
+
+            const obj = { ...that.filters }
+            if (value[0]) {
+              obj[row] = value[0]
+            } else {
+              delete obj[row]
+            }
+            that.filters = obj
+            // that.$set(that.filters, row, value)
+          }
         },
         {
           title: '请求路径',
@@ -128,7 +157,8 @@ export default {
       total: 0,
       pageArr: [10, 20, 30, 50, 100],
       loading: false,
-      selections: []
+      selections: [],
+      filters: {}
     }
   },
   mounted () {
@@ -139,12 +169,21 @@ export default {
       this.loading = true
       getErrorList({
         page: this.page,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
+        filter: this.filters || {}
       }).then(res => {
         if (res.code === 200) {
           this.tableData = res.data
           this.total = res.total
           this.loading = false
+          const keys = Object.keys(res.filters)
+          this.columns.forEach(item => {
+            if (keys.includes(item.key)) {
+              if (item.filters.length === 0) {
+                item.filters = res.filters[item.key]
+              }
+            }
+          })
         }
       })
     },
@@ -180,6 +219,17 @@ export default {
         }
       })
     }
+  },
+  watch: {
+    filters (newVal, oldVal) {
+      this._getErrorList()
+    }
+    // filters: {
+    //   handler (newVal, oldVal) {
+    //     console.log(newVal, oldVal)
+    //   },
+    //   deep: true
+    // }
   }
 }
 </script>
